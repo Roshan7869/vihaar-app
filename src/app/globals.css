@@ -46,6 +46,13 @@
 
   /* Fonts */
   --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+
+  /* Animation timing functions - professional easing */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out-quint: cubic-bezier(0.83, 0, 0.17, 1);
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ============================================
@@ -118,53 +125,110 @@ body {
 }
 
 /* ============================================
-   Glassmorphism Utilities
+   Glassmorphism Utilities - Enhanced
    ============================================ */
 .glass {
   background: hsl(var(--glass-bg));
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
   border: 1px solid hsl(var(--glass-border));
   border-radius: 1rem;
+  transition: all 0.4s var(--ease-out-expo);
+}
+
+.glass:hover {
+  backdrop-filter: blur(32px) saturate(200%);
+  border-color: hsl(0 0% 100% / 0.12);
 }
 
 .glass-nav {
-  background: hsl(var(--background) / 0.95);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background: hsl(var(--background) / 0.85);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
   border-top: 1px solid hsl(0 0% 100% / 0.1);
 }
 
 .glass-header {
-  background: hsl(var(--background) / 0.9);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: hsl(var(--background) / 0.85);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
 }
 
 /* ============================================
-   Interactive States
+   Interactive States - Premium Feel
    ============================================ */
 .press {
-  transition: transform 200ms ease-out;
+  transition: transform 0.3s var(--ease-out-expo),
+    box-shadow 0.3s var(--ease-out-expo),
+    filter 0.3s var(--ease-out-expo);
+}
+
+.press:hover {
+  transform: translateY(-2px);
 }
 
 .press:active {
-  transform: scale(0.96);
+  transform: scale(0.97) translateY(0);
+}
+
+/* Button hover glow effect */
+.btn-glow {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s var(--ease-out-expo);
+}
+
+.btn-glow::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(45deg,
+      hsl(var(--primary) / 0.5),
+      transparent,
+      hsl(var(--primary) / 0.5));
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.4s var(--ease-out-expo);
+  z-index: -1;
+  filter: blur(8px);
+}
+
+.btn-glow:hover::before {
+  opacity: 1;
 }
 
 /* ============================================
-   Gradient Overlays
+   Gradient Overlays - Cinematic
    ============================================ */
 .gradient-overlay {
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+  background: linear-gradient(to top,
+      rgba(0, 0, 0, 0.95) 0%,
+      rgba(0, 0, 0, 0.6) 40%,
+      rgba(0, 0, 0, 0.2) 70%,
+      transparent 100%);
 }
 
 .gradient-heavy {
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.4), transparent);
+  background: linear-gradient(to top,
+      rgba(0, 0, 0, 0.98) 0%,
+      rgba(0, 0, 0, 0.7) 30%,
+      rgba(0, 0, 0, 0.4) 60%,
+      transparent 100%);
 }
 
 .gradient-card {
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.7) 40%, transparent 100%);
+  background: linear-gradient(to top,
+      rgba(0, 0, 0, 0.98) 0%,
+      rgba(0, 0, 0, 0.8) 35%,
+      rgba(0, 0, 0, 0.4) 60%,
+      transparent 100%);
+}
+
+/* Parallax gradient for depth */
+.gradient-parallax {
+  background: radial-gradient(ellipse at 50% 0%,
+      hsl(var(--primary) / 0.15) 0%,
+      transparent 50%);
 }
 
 /* ============================================
@@ -187,6 +251,12 @@ body {
 
 .snap-y-mandatory {
   scroll-snap-type: y mandatory;
+}
+
+/* Smooth scroll with momentum */
+.scroll-smooth {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* ============================================
@@ -221,9 +291,119 @@ body {
 }
 
 /* ============================================
-   Animations
+   Premium Keyframe Animations
    ============================================ */
+
+/* Smooth fade in with slide */
 @keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Elegant slide up */
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Staggered reveal animation */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.98);
+    filter: blur(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* Scale in with bounce */
+@keyframes scale-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  50% {
+    transform: scale(1.02);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Parallax float effect */
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Subtle pulse glow */
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
+  }
+
+  50% {
+    opacity: 0.9;
+    box-shadow: 0 0 40px hsl(var(--primary) / 0.5);
+  }
+}
+
+/* Professional shimmer - smoother and cleaner */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Loading skeleton wave */
+@keyframes skeleton-wave {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Page transition fade */
+@keyframes page-enter {
   from {
     opacity: 0;
     transform: translateY(10px);
@@ -235,100 +415,229 @@ body {
   }
 }
 
-@keyframes slide-up {
+/* Card hover lift */
+@keyframes card-lift {
   from {
-    transform: translateY(100%);
+    transform: translateY(0) scale(1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   }
 
   to {
-    transform: translateY(0);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
   }
 }
 
-@keyframes pulse-live {
-
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.5;
-  }
-}
-
-@keyframes scale-in {
-  from {
-    transform: scale(0.95);
-    opacity: 0;
-  }
-
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -1000px 0;
-  }
-
-  100% {
-    background-position: 1000px 0;
-  }
-}
-
-@keyframes shimmer-fast {
-  0% {
-    background-position: -500px 0;
-  }
-
-  100% {
-    background-position: 500px 0;
-  }
-}
-
+/* ============================================
+   Animation Utility Classes
+   ============================================ */
 .animate-fade-in {
-  animation: fade-in 0.3s ease-out forwards;
+  animation: fade-in 0.6s var(--ease-out-expo) forwards;
 }
 
 .animate-slide-up {
-  animation: slide-up 0.3s ease-out;
+  animation: slide-up 0.5s var(--ease-out-expo) forwards;
 }
 
-.animate-pulse-live {
-  animation: pulse-live 2s ease-in-out infinite;
+.animate-reveal-up {
+  animation: reveal-up 0.7s var(--ease-out-expo) forwards;
 }
 
 .animate-scale-in {
-  animation: scale-in 0.2s ease-out;
+  animation: scale-in 0.5s var(--ease-spring) forwards;
 }
 
-/* Enhanced shimmer effect with brighter highlight */
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+.animate-page-enter {
+  animation: page-enter 0.5s var(--ease-out-expo) forwards;
+}
+
+/* Staggered animation delays for lists */
+.stagger-1 {
+  animation-delay: 0.05s;
+}
+
+.stagger-2 {
+  animation-delay: 0.1s;
+}
+
+.stagger-3 {
+  animation-delay: 0.15s;
+}
+
+.stagger-4 {
+  animation-delay: 0.2s;
+}
+
+.stagger-5 {
+  animation-delay: 0.25s;
+}
+
+.stagger-6 {
+  animation-delay: 0.3s;
+}
+
+/* ============================================
+   Premium Shimmer Effects
+   ============================================ */
+
+/* Clean, professional shimmer */
 .shimmer {
+  position: relative;
+  overflow: hidden;
+  background: hsl(var(--muted));
+}
+
+.shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
   background: linear-gradient(90deg,
-      hsl(var(--muted)) 0%,
-      hsl(var(--muted)) 35%,
+      transparent 0%,
+      hsl(0 0% 100% / 0.08) 20%,
       hsl(0 0% 100% / 0.15) 50%,
-      hsl(var(--muted)) 65%,
-      hsl(var(--muted)) 100%);
-  background-size: 1000px 100%;
-  animation: shimmer 1.5s infinite linear;
-  will-change: background-position;
+      hsl(0 0% 100% / 0.08) 80%,
+      transparent 100%);
+  animation: shimmer 2s infinite ease-in-out;
+  transform: translateX(-100%);
+}
+
+/* Skeleton loading with wave effect */
+.skeleton-wave {
+  position: relative;
+  overflow: hidden;
+  background: hsl(var(--muted));
+  border-radius: 8px;
+}
+
+.skeleton-wave::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg,
+      transparent,
+      hsl(0 0% 100% / 0.1),
+      transparent);
+  animation: skeleton-wave 1.5s infinite;
 }
 
 /* Faster shimmer for smaller elements */
 .shimmer-fast {
+  position: relative;
+  overflow: hidden;
+  background: hsl(var(--muted));
+}
+
+.shimmer-fast::after {
+  content: '';
+  position: absolute;
+  inset: 0;
   background: linear-gradient(90deg,
-      hsl(var(--muted)) 0%,
-      hsl(var(--muted)) 35%,
+      transparent 0%,
+      hsl(0 0% 100% / 0.12) 40%,
       hsl(0 0% 100% / 0.2) 50%,
-      hsl(var(--muted)) 65%,
+      hsl(0 0% 100% / 0.12) 60%,
+      transparent 100%);
+  animation: shimmer 1.2s infinite ease-in-out;
+  transform: translateX(-100%);
+}
+
+/* ============================================
+   Parallax & 3D Effects
+   ============================================ */
+
+/* Parallax container */
+.parallax-container {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+/* Parallax card effect on hover */
+.parallax-card {
+  transition: transform 0.4s var(--ease-out-expo);
+  transform-style: preserve-3d;
+}
+
+.parallax-card:hover {
+  transform: rotateX(2deg) rotateY(-2deg) translateZ(10px);
+}
+
+/* Depth layers for parallax */
+.depth-1 {
+  transform: translateZ(10px);
+}
+
+.depth-2 {
+  transform: translateZ(20px);
+}
+
+.depth-3 {
+  transform: translateZ(30px);
+}
+
+/* ============================================
+   Card Transitions & Hover Effects
+   ============================================ */
+
+/* Premium card hover */
+.card-hover {
+  transition: all 0.5s var(--ease-out-expo);
+}
+
+.card-hover:hover {
+  transform: translateY(-8px) scale(1.01);
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    0 0 60px hsl(var(--primary) / 0.1);
+}
+
+.card-hover:hover .card-image {
+  transform: scale(1.08);
+}
+
+/* Image zoom on hover */
+.card-image {
+  transition: transform 0.6s var(--ease-out-expo);
+}
+
+/* Content reveal on hover */
+.card-content {
+  transition: all 0.4s var(--ease-out-expo);
+}
+
+.card-hover:hover .card-content {
+  transform: translateY(-4px);
+}
+
+/* ============================================
+   Loading States
+   ============================================ */
+
+/* Skeleton pulse with glow */
+.skeleton-glow {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(110deg,
+      hsl(var(--muted)) 0%,
+      hsl(var(--muted)) 40%,
+      hsl(var(--muted-foreground) / 0.1) 50%,
+      hsl(var(--muted)) 60%,
       hsl(var(--muted)) 100%);
-  background-size: 500px 100%;
-  animation: shimmer-fast 1s infinite linear;
-  will-change: background-position;
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+  border-radius: inherit;
+}
+
+/* Content fade in after load */
+.content-loaded {
+  animation: fade-in 0.5s var(--ease-out-expo) forwards;
 }
 
 /* ============================================
@@ -356,6 +665,17 @@ body {
   text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
+/* Gradient text */
+.text-gradient {
+  background: linear-gradient(135deg,
+      hsl(var(--primary)) 0%,
+      hsl(var(--accent)) 50%,
+      hsl(var(--primary)) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 /* ============================================
    Glow Effects
    ============================================ */
@@ -365,4 +685,81 @@ body {
 
 .shadow-glow-sm {
   box-shadow: 0 0 20px hsl(var(--primary) / 0.2);
+}
+
+.shadow-glow-lg {
+  box-shadow:
+    0 0 60px hsl(var(--primary) / 0.4),
+    0 0 100px hsl(var(--primary) / 0.2);
+}
+
+/* ============================================
+   Micro-interactions
+   ============================================ */
+
+/* Button ripple effect */
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, hsl(0 0% 100% / 0.2) 10%, transparent 10.01%);
+  background-repeat: no-repeat;
+  background-position: 50%;
+  transform: scale(10, 10);
+  opacity: 0;
+  transition: transform 0.5s, opacity 0.5s;
+}
+
+.ripple:active::after {
+  transform: scale(0, 0);
+  opacity: 0.3;
+  transition: 0s;
+}
+
+/* Focus ring */
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px hsl(var(--background)),
+    0 0 0 4px hsl(var(--primary));
+}
+
+/* ============================================
+   Image Loading States
+   ============================================ */
+
+/* Blur-up image loading */
+.image-loading {
+  filter: blur(10px);
+  transform: scale(1.05);
+  transition: filter 0.5s var(--ease-out-expo),
+    transform 0.5s var(--ease-out-expo);
+}
+
+.image-loaded {
+  filter: blur(0);
+  transform: scale(1);
+}
+
+/* ============================================
+   Reduced Motion Preferences
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

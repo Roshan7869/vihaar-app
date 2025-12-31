@@ -17,7 +17,8 @@ interface ProgressiveImageProps {
 }
 
 /**
- * Progressive Image Component with shimmer loading
+ * Premium Progressive Image Component
+ * Features blur-up loading effect, smooth transitions, and error handling
  */
 export function ProgressiveImage({
     src,
@@ -48,41 +49,57 @@ export function ProgressiveImage({
         setIsLoaded(true);
     };
 
-    // Common image props
+    // Image wrapper with blur-up effect
+    const wrapperClassName = cn(
+        "transition-all duration-700 ease-out",
+        isLoaded ? "filter-none" : "blur-sm scale-[1.02]"
+    );
+
+    // Image opacity transition
     const imageClassName = cn(
-        "transition-opacity duration-500",
-        isLoaded ? "opacity-100" : "opacity-0",
+        "transition-all duration-700",
+        isLoaded ? "opacity-100 scale-100" : "opacity-0 scale-[1.02]",
         className
     );
 
     if (fill) {
         return (
             <>
-                {/* Shimmer placeholder */}
-                {!isLoaded && (
-                    <div className="absolute inset-0 shimmer bg-muted" />
-                )}
+                {/* Skeleton wave placeholder */}
+                <div
+                    className={cn(
+                        "absolute inset-0 skeleton-wave transition-opacity duration-500",
+                        isLoaded ? "opacity-0" : "opacity-100"
+                    )}
+                />
 
                 {/* Error state */}
                 {hasError && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-card">
-                        <span className="text-muted-foreground text-sm">Image unavailable</span>
+                    <div className="absolute inset-0 flex items-center justify-center bg-card/80 backdrop-blur-sm">
+                        <div className="text-center">
+                            <span className="material-symbols-outlined text-muted-foreground/50 text-4xl mb-2 block">
+                                image_not_supported
+                            </span>
+                            <span className="text-muted-foreground text-sm">Image unavailable</span>
+                        </div>
                     </div>
                 )}
 
-                {/* Actual image */}
+                {/* Actual image with blur-up effect */}
                 {!hasError && (
-                    <Image
-                        src={src}
-                        alt={alt}
-                        fill
-                        priority={priority}
-                        sizes={sizes || "100vw"}
-                        quality={quality}
-                        className={imageClassName}
-                        onLoad={handleLoad}
-                        onError={handleError}
-                    />
+                    <div className={wrapperClassName}>
+                        <Image
+                            src={src}
+                            alt={alt}
+                            fill
+                            priority={priority}
+                            sizes={sizes || "100vw"}
+                            quality={quality}
+                            className={imageClassName}
+                            onLoad={handleLoad}
+                            onError={handleError}
+                        />
+                    </div>
                 )}
             </>
         );
@@ -90,33 +107,41 @@ export function ProgressiveImage({
 
     // Fixed dimensions mode
     return (
-        <div className="relative overflow-hidden bg-muted" style={{ width, height }}>
-            {/* Shimmer placeholder */}
-            {!isLoaded && (
-                <div className="absolute inset-0 shimmer bg-muted" />
-            )}
+        <div
+            className="relative overflow-hidden bg-muted rounded-xl"
+            style={{ width, height }}
+        >
+            {/* Skeleton wave placeholder */}
+            <div
+                className={cn(
+                    "absolute inset-0 skeleton-wave transition-opacity duration-500",
+                    isLoaded ? "opacity-0" : "opacity-100"
+                )}
+            />
 
             {/* Error state */}
             {hasError && (
-                <div className="absolute inset-0 flex items-center justify-center bg-card">
+                <div className="absolute inset-0 flex items-center justify-center bg-card/80 backdrop-blur-sm">
                     <span className="text-muted-foreground text-xs">Image unavailable</span>
                 </div>
             )}
 
             {/* Actual image */}
             {!hasError && (
-                <Image
-                    src={src}
-                    alt={alt}
-                    width={width || 600}
-                    height={height || 400}
-                    priority={priority}
-                    sizes={sizes || "100vw"}
-                    quality={quality}
-                    className={imageClassName}
-                    onLoad={handleLoad}
-                    onError={handleError}
-                />
+                <div className={wrapperClassName}>
+                    <Image
+                        src={src}
+                        alt={alt}
+                        width={width || 600}
+                        height={height || 400}
+                        priority={priority}
+                        sizes={sizes || "100vw"}
+                        quality={quality}
+                        className={imageClassName}
+                        onLoad={handleLoad}
+                        onError={handleError}
+                    />
+                </div>
             )}
         </div>
     );

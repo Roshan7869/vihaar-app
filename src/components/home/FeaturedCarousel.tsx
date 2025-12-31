@@ -126,8 +126,8 @@ export const FeaturedCarousel = ({ onExplore }: FeaturedCarouselProps) => {
                             key={index}
                             onClick={() => setCurrentIndex(index)}
                             className={`h-2 rounded-full transition-all duration-300 ${index === currentIndex
-                                    ? "bg-primary w-6"
-                                    : "bg-muted-foreground/40 w-2"
+                                ? "bg-primary w-6"
+                                : "bg-muted-foreground/40 w-2"
                                 }`}
                         />
                     ))}
@@ -136,7 +136,7 @@ export const FeaturedCarousel = ({ onExplore }: FeaturedCarouselProps) => {
 
             <div
                 ref={containerRef}
-                className="relative rounded-3xl overflow-hidden cursor-grab active:cursor-grabbing select-none"
+                className="relative rounded-3xl overflow-hidden cursor-grab active:cursor-grabbing select-none parallax-container"
                 onTouchStart={handleTouchStart}
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
@@ -146,12 +146,15 @@ export const FeaturedCarousel = ({ onExplore }: FeaturedCarouselProps) => {
                 onMouseLeave={handleMouseLeave}
             >
                 <div
-                    className={`flex ${isDragging ? '' : 'transition-transform duration-500 ease-out'}`}
-                    style={{ transform: `translateX(${translateX}%)` }}
+                    className={`flex ${isDragging ? '' : 'transition-transform duration-700'}`}
+                    style={{
+                        transform: `translateX(${translateX}%)`,
+                        transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)'
+                    }}
                 >
                     {featuredItems.map((item, index) => (
                         <div key={item.id} className="w-full flex-shrink-0">
-                            <div className="relative aspect-[4/3]">
+                            <div className="relative aspect-[4/3] overflow-hidden">
                                 <ProgressiveImage
                                     src={item.image}
                                     alt={item.title}

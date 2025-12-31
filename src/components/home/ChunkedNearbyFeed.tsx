@@ -248,17 +248,20 @@ export const ChunkedNearbyFeed = ({ onItemClick, onViewAll, onLoadComplete }: Ch
                             <div
                                 key={item.id}
                                 onClick={() => onItemClick?.(item.id)}
-                                className="glass rounded-3xl overflow-hidden press cursor-pointer group animate-fade-in"
-                                style={{ animationDelay: `${(index % CHUNK_SIZE) * 100}ms` }}
+                                className="glass rounded-3xl overflow-hidden cursor-pointer group card-hover animate-reveal-up"
+                                style={{
+                                    animationDelay: `${(index % CHUNK_SIZE) * 0.1}s`,
+                                    opacity: 0
+                                }}
                             >
                                 <div className="relative">
-                                    <div className="relative aspect-[15/16]">
+                                    <div className="relative aspect-[15/16] overflow-hidden">
                                         <ProgressiveImage
                                             src={item.image}
                                             alt={item.title}
                                             fill
                                             sizes="(max-width: 420px) 100vw, 420px"
-                                            className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                            className="object-cover card-image"
                                         />
                                     </div>
 
