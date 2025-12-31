@@ -1,75 +1,143 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter, useParams } from "next/navigation";
-import { TopBar } from "@/components/nav/TopBar";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Icon } from "@/components/ui/Icon";
+import { ProgressiveImage } from "@/components/ui/ProgressiveImage";
 import { BottomNav } from "@/components/nav/BottomNav";
-import { getPlaceById, placeDetails } from "@/lib/data";
+import Link from "next/link";
 
-export default function PlaceIntroPage() {
+interface PlaceDetailPageProps {
+    params: Promise<{ id: string }>;
+}
+
+export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
+    const [liked, setLiked] = useState(false);
     const router = useRouter();
-    const params = useParams();
-    const placeId = params.id as string;
 
-    // Get place data
-    const place = getPlaceById(placeId) || placeDetails["chitrakote-falls"];
+    const handleNavigate = () => {
+        router.push("/travel");
+    };
 
     return (
-        <div className="relative h-screen w-full flex flex-col app-container shadow-2xl bg-black overflow-hidden">
-            {/* Background Image */}
-            <div className="absolute inset-0 z-0">
-                <div
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-700 hover:scale-105"
-                    style={{ backgroundImage: `url('${place.images[0]}')` }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent via-50% to-black" />
-            </div>
+        <div className="flex justify-center bg-background min-h-screen">
+            <div className="max-w-[420px] w-full min-h-screen relative">
+                <div className="min-h-screen pb-24">
+                    {/* Hero */}
+                    <div className="relative h-[60vh]">
+                        <ProgressiveImage
+                            src="https://images.unsplash.com/photo-1548013146-72479768bada?w=1200"
+                            alt="Chitrakote Falls"
+                            fill
+                            sizes="100vw"
+                            className="object-cover"
+                            priority
+                        />
+                        <div className="absolute inset-0 gradient-overlay" />
 
-            {/* Top Bar */}
-            <TopBar transparent={true} />
-
-            {/* Content Overlay */}
-            <div className="absolute bottom-[140px] left-0 right-0 px-6 z-20 pointer-events-none flex flex-col justify-end">
-                <div className="flex flex-col gap-1 mb-6">
-                    <h1 className="text-5xl font-bold leading-tight tracking-tight text-white text-shadow-lg">
-                        {place.title}
-                    </h1>
-                    <div className="flex items-center gap-2 text-primary mt-1">
-                        <span className="material-symbols-outlined text-[22px] drop-shadow-md">
-                            location_on
-                        </span>
-                        <span className="text-white/90 text-lg font-medium drop-shadow-md">
-                            {place.location}
-                        </span>
-                    </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="w-full app-container pointer-events-auto">
-                    <div className="flex gap-4">
-                        <Link
-                            href={`/places/${placeId}/details`}
-                            className="flex-1 h-14 rounded-2xl glass-action-btn text-white font-semibold text-base flex items-center justify-center gap-2 transition-all hover:bg-white/10 active:scale-95"
-                        >
-                            <span className="material-symbols-outlined text-[20px] bg-white text-black rounded-full p-0.5">
-                                info
-                            </span>
-                            View Details
-                        </Link>
-                        <button className="flex-1 h-14 rounded-2xl glass-action-btn text-white font-semibold text-base flex items-center justify-center gap-2 transition-all hover:bg-white/10 active:scale-95">
-                            <span
-                                className="material-symbols-outlined text-[20px]"
-                                style={{ fontVariationSettings: "'FILL' 1" }}
+                        {/* Top actions */}
+                        <div className="absolute top-0 left-0 right-0 flex justify-between items-center p-5 pt-6">
+                            <Link
+                                href="/"
+                                className="w-10 h-10 glass rounded-full flex items-center justify-center press"
                             >
-                                navigation
+                                <Icon name="arrow_back" />
+                            </Link>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => setLiked(!liked)}
+                                    className="w-10 h-10 glass rounded-full flex items-center justify-center press"
+                                >
+                                    <Icon
+                                        name="favorite"
+                                        filled={liked}
+                                        size="md"
+                                        className={liked ? "text-destructive" : "text-foreground"}
+                                    />
+                                </button>
+                                <button className="w-10 h-10 glass rounded-full flex items-center justify-center press">
+                                    <Icon name="share" size="md" />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Title overlay */}
+                        <div className="absolute bottom-6 left-5 right-5">
+                            <span className="text-[11px] bg-primary px-3 py-1 rounded-full font-bold uppercase tracking-wide text-primary-foreground">
+                                Nature
                             </span>
-                            Travel Here
+                            <h1 className="mt-3 text-3xl font-extrabold leading-tight text-foreground">
+                                Chitrakote Falls
+                            </h1>
+                            <div className="flex items-center gap-1 mt-2 text-muted-foreground">
+                                <Icon name="location_on" size="sm" />
+                                <span className="text-sm">Bastar, Chhattisgarh</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="px-5 pt-6 space-y-6">
+                        {/* Description */}
+                        <div>
+                            <h3 className="font-bold text-lg mb-2 text-foreground">About</h3>
+                            <p className="text-muted-foreground text-sm leading-relaxed">
+                                Known as the "Niagara of India", Chitrakote Falls is a stunning horseshoe-shaped waterfall
+                                located on the Indravati River. During monsoon season, the falls expand to nearly 300 meters
+                                in width, creating a breathtaking spectacle of nature&apos;s power.
+                            </p>
+                        </div>
+
+                        {/* Highlights */}
+                        <div>
+                            <h3 className="font-bold text-lg mb-3 text-foreground">Highlights</h3>
+                            <div className="grid grid-cols-2 gap-3">
+                                {[
+                                    { icon: "water_drop", label: "90ft Height" },
+                                    { icon: "straighten", label: "985ft Width" },
+                                    { icon: "photo_camera", label: "Photography" },
+                                    { icon: "hiking", label: "Boat Rides" },
+                                ].map((item) => (
+                                    <div
+                                        key={item.label}
+                                        className="glass p-4 rounded-xl flex items-center gap-3"
+                                    >
+                                        <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
+                                            <Icon name={item.icon} className="text-primary" size="md" />
+                                        </div>
+                                        <span className="text-sm font-medium text-foreground">{item.label}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Best time */}
+                        <div>
+                            <h3 className="font-bold text-lg mb-2 text-foreground">Best Time to Visit</h3>
+                            <div className="glass p-4 rounded-xl flex items-center gap-3">
+                                <Icon name="calendar_month" className="text-primary" />
+                                <div>
+                                    <p className="font-medium text-foreground">July - October</p>
+                                    <p className="text-muted-foreground text-sm">Monsoon season for full waterfall flow</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Fixed CTA */}
+                    <div className="fixed bottom-20 left-0 right-0 px-5 max-w-[420px] mx-auto">
+                        <button
+                            onClick={handleNavigate}
+                            className="w-full bg-primary text-primary-foreground py-4 rounded-2xl font-bold flex items-center justify-center gap-2 press shadow-glow"
+                        >
+                            <Icon name="near_me" filled />
+                            Navigate to Location
                         </button>
                     </div>
                 </div>
-            </div>
 
-            <BottomNav />
+                <BottomNav />
+            </div>
         </div>
     );
 }

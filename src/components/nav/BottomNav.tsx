@@ -2,69 +2,71 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Icon } from "@/components/ui/Icon";
 import { cn } from "@/lib/utils";
 
 interface NavItem {
     id: string;
     label: string;
     icon: string;
-    path: string;
+    href: string;
+    badge?: boolean;
 }
 
 const navItems: NavItem[] = [
-    { id: "home", label: "Home", icon: "home", path: "/" },
-    { id: "explore", label: "Explore", icon: "explore", path: "/explore" },
-    { id: "profile", label: "Profile", icon: "person", path: "/profile" },
+    { id: "home", label: "Home", icon: "home", href: "/" },
+    { id: "explore", label: "Explore", icon: "explore", href: "/explore" },
+    { id: "saved", label: "Saved", icon: "favorite", href: "/saved" },
+    { id: "profile", label: "Profile", icon: "person", href: "/profile", badge: true },
 ];
 
-export function BottomNav() {
+export const BottomNav = () => {
     const pathname = usePathname();
 
-    const isActive = (path: string) => {
-        if (path === "/") return pathname === "/";
-        return pathname.startsWith(path);
+    // Determine active tab based on current route
+    const getActiveTab = () => {
+        if (pathname === "/") return "home";
+        if (pathname.startsWith("/explore")) return "explore";
+        if (pathname.startsWith("/saved")) return "saved";
+        if (pathname.startsWith("/profile")) return "profile";
+        return "home";
     };
 
+    const activeTab = getActiveTab();
+
     return (
-        <div className="fixed bottom-0 left-0 right-0 z-40">
-            <div className="app-container pointer-events-auto glass-nav pb-6 pt-4 px-6 flex justify-around items-center rounded-t-[32px] shadow-[0_-5px_20px_rgba(0,0,0,0.3)]">
-                {navItems.map((item) => (
-                    <Link
-                        key={item.id}
-                        href={item.path}
-                        className="flex flex-col items-center gap-1 group w-16"
-                    >
-                        <div
+        <nav className="fixed bottom-0 left-0 right-0 z-50 safe-bottom">
+            <div className="max-w-[420px] mx-auto glass-nav">
+                <div className="flex justify-around py-3">
+                    {navItems.map((item) => (
+                        <Link
+                            key={item.id}
+                            href={item.href}
                             className={cn(
-                                "size-10 rounded-full flex items-center justify-center transition-colors",
-                                isActive(item.path) ? "bg-white/10" : "group-hover:bg-white/10"
+                                "flex flex-col items-center gap-0.5 px-6 py-1 transition-colors press relative",
+                                activeTab === item.id ? "text-primary" : "text-muted-foreground"
                             )}
                         >
-                            <span
-                                className={cn(
-                                    "material-symbols-outlined text-[28px] transition-transform",
-                                    isActive(item.path)
-                                        ? "text-primary scale-110"
-                                        : "text-gray-400 group-hover:text-white group-hover:scale-110"
+                            <div className="relative">
+                                <Icon
+                                    name={item.icon}
+                                    filled={activeTab === item.id}
+                                    size="lg"
+                                />
+                                {item.badge && (
+                                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-destructive rounded-full" />
                                 )}
-                                style={isActive(item.path) ? { fontVariationSettings: "'FILL' 1" } : undefined}
-                            >
-                                {item.icon}
+                            </div>
+                            <span className={cn(
+                                "text-[10px]",
+                                activeTab === item.id ? "font-bold" : "font-medium"
+                            )}>
+                                {item.label}
                             </span>
-                        </div>
-                        <span
-                            className={cn(
-                                "text-xs font-medium transition-colors",
-                                isActive(item.path)
-                                    ? "text-primary"
-                                    : "text-gray-400 group-hover:text-white"
-                            )}
-                        >
-                            {item.label}
-                        </span>
-                    </Link>
-                ))}
+                        </Link>
+                    ))}
+                </div>
             </div>
-        </div>
+        </nav>
     );
-}
+};

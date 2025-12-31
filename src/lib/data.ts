@@ -1,4 +1,5 @@
 import { FeaturedPlace, Place, User, WishlistItem, CategoryFilter } from "@/types";
+import { bhilaiPlaces, getBhilaiPlacesByDistance } from "./bhilai-places";
 
 // ============================================
 // Category Filters
@@ -12,10 +13,12 @@ export const categoryFilters: CategoryFilter[] = [
 ];
 
 export const exploreFilters: CategoryFilter[] = [
-    { id: "temple", label: "Temple" },
-    { id: "historical", label: "Historical Place" },
-    { id: "natural", label: "Natural Place" },
-    { id: "food", label: "Cafe & Food" },
+    { id: "all", label: "All" },
+    { id: "temple", label: "Temples" },
+    { id: "nature", label: "Nature" },
+    { id: "historical", label: "Historical" },
+    { id: "art_craft", label: "Shopping" },
+    { id: "event", label: "Industrial" },
 ];
 
 // ============================================
@@ -260,7 +263,20 @@ export const placeDetails: Record<string, Place> = {
     },
 };
 
+// ============================================
+// Bhilai Places Export
+// ============================================
+export { bhilaiPlaces, getBhilaiPlacesByDistance } from "./bhilai-places";
+
+// Combined places for explore page (existing + Bhilai)
+export const allExplorePlaces: Place[] = [...explorePlaces, ...bhilaiPlaces];
+
 // Helper function to get place by ID
 export function getPlaceById(id: string): Place | undefined {
-    return placeDetails[id] || hiddenGems.find(p => p.id === id) || explorePlaces.find(p => p.id === id);
+    return (
+        placeDetails[id] ||
+        hiddenGems.find(p => p.id === id) ||
+        explorePlaces.find(p => p.id === id) ||
+        bhilaiPlaces.find(p => p.id === id)
+    );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter, useParams } from "next/navigation";
 import { TopBar } from "@/components/nav/TopBar";
 import { getPlaceById, placeDetails } from "@/lib/data";
@@ -19,11 +20,15 @@ export default function PlaceDetailPage() {
 
     return (
         <div className="relative h-screen w-full flex flex-col app-container shadow-2xl bg-black overflow-hidden">
-            {/* Background Image */}
+            {/* Background Image - Optimized with Next.js Image */}
             <div className="absolute inset-0 z-0">
-                <div
-                    className="absolute inset-0 bg-cover bg-center"
-                    style={{ backgroundImage: `url('${place.images[0]}')` }}
+                <Image
+                    src={place.images[0]}
+                    alt={place.title}
+                    fill
+                    sizes="(max-width: 480px) 100vw, 480px"
+                    className="object-cover"
+                    priority
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80" />
             </div>
@@ -82,8 +87,8 @@ export default function PlaceDetailPage() {
                                     key={tab}
                                     onClick={() => setActiveTab(tab)}
                                     className={`flex-1 pb-4 border-b-2 font-medium text-base tracking-wide transition-colors ${activeTab === tab
-                                            ? "border-primary text-primary font-bold"
-                                            : "border-transparent text-gray-400 hover:text-white"
+                                        ? "border-primary text-primary font-bold"
+                                        : "border-transparent text-gray-400 hover:text-white"
                                         }`}
                                 >
                                     {tab}

@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "analyze": "ANALYZE=true npm run build",
+    "lighthouse": "lhci autorun --config=lighthouserc.json",
+    "lighthouse:local": "lighthouse http://localhost:3000 --config-path=lighthouse-config.json --view",
+    "perf:test": "npm run build && npm start & sleep 5 && npm run lighthouse && kill $(lsof -t -i:3000)"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -16,6 +20,7 @@
     "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^16.1.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19.2.7",
