@@ -36,27 +36,33 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
                         <div className="absolute inset-0 gradient-overlay" />
 
                         {/* Top actions */}
-                        <div className="absolute top-0 left-0 right-0 flex justify-between items-center p-5 pt-6">
+                        <div className="absolute top-0 left-0 right-0 flex justify-between items-start p-5 pt-6 z-20 pointer-events-none">
                             <Link
                                 href="/"
-                                className="w-10 h-10 glass rounded-full flex items-center justify-center press"
+                                className="w-10 h-10 glass rounded-full flex items-center justify-center press pointer-events-auto"
                             >
                                 <Icon name="arrow_back" />
                             </Link>
-                            <div className="flex gap-2">
+                            <div className="flex flex-col gap-3 pointer-events-auto">
                                 <button
                                     onClick={() => setLiked(!liked)}
-                                    className="w-10 h-10 glass rounded-full flex items-center justify-center press"
+                                    className="w-12 h-12 glass rounded-full flex items-center justify-center press transition-colors"
                                 >
                                     <Icon
                                         name="favorite"
                                         filled={liked}
                                         size="md"
-                                        className={liked ? "text-destructive" : "text-foreground"}
+                                        className={liked ? "text-destructive" : "text-white"}
                                     />
                                 </button>
-                                <button className="w-10 h-10 glass rounded-full flex items-center justify-center press">
+                                <button className="w-12 h-12 glass rounded-full flex items-center justify-center press text-white transition-colors">
                                     <Icon name="share" size="md" />
+                                </button>
+                                <button
+                                    onClick={handleNavigate}
+                                    className="w-12 h-12 bg-primary rounded-full flex items-center justify-center press text-white shadow-xl shadow-primary/30 transition-transform hover:scale-105 active:scale-95"
+                                >
+                                    <Icon name="navigation" size="md" filled />
                                 </button>
                             </div>
                         </div>
