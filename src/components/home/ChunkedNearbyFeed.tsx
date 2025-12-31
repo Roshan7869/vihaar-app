@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { ProgressiveImage } from "@/components/ui/ProgressiveImage";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -92,11 +92,12 @@ const categories = [
 // Configuration for chunk loading
 const INITIAL_ITEMS = 2;
 const CHUNK_SIZE = 2;
-const LOAD_DELAY = 300; // ms delay to simulate/show loading effect
+const LOAD_DELAY = 300; // ms delay to show loading effect
 
 interface ChunkedNearbyFeedProps {
     onItemClick?: (id: string) => void;
     onViewAll?: () => void;
+    onLoadComplete?: () => void; // Callback when initial load completes
 }
 
 /**
@@ -107,12 +108,10 @@ function NearbyItemSkeleton() {
         <div className="rounded-3xl overflow-hidden bg-card border border-white/5">
             <div className="relative aspect-[15/16]">
                 <Skeleton className="absolute inset-0 rounded-none" />
-                {/* Top overlay with rating skeleton */}
                 <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
                     <Skeleton className="w-16 h-8 rounded-full" />
                     <Skeleton className="w-20 h-8 rounded-full" />
                 </div>
-                {/* Bottom content skeleton */}
                 <div className="absolute bottom-0 left-0 right-0 p-5 space-y-3">
                     <Skeleton className="w-16 h-5 rounded-full" />
                     <Skeleton className="w-3/4 h-6" variant="text" />
@@ -125,11 +124,14 @@ function NearbyItemSkeleton() {
     );
 }
 
-export const ChunkedNearbyFeed = ({ onItemClick, onViewAll }: ChunkedNearbyFeedProps) => {
+export const ChunkedNearbyFeed = ({ onItemClick, onViewAll, onLoadComplete }: ChunkedNearbyFeedProps) => {
     const [activeCategory, setActiveCategory] = useState("all");
     const [displayedItems, setDisplayedItems] = useState<NearbyItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
+
+    // Ref for the sentinel element (triggers loading when visible)
+    const sentinelRef = useRef<HTMLDivElement>(null);
 
     // Get filtered items based on category
     const filteredItems = activeCategory === "all"
@@ -144,16 +146,16 @@ export const ChunkedNearbyFeed = ({ onItemClick, onViewAll }: ChunkedNearbyFeedP
         setIsLoading(true);
         setDisplayedItems([]);
 
-        // Simulate initial load delay for shimmer effect visibility
         const timer = setTimeout(() => {
             setDisplayedItems(filteredItems.slice(0, INITIAL_ITEMS));
             setIsLoading(false);
+            onLoadComplete?.();
         }, LOAD_DELAY);
 
         return () => clearTimeout(timer);
     }, [activeCategory]);
 
-    // Load more items
+    // Load more items function
     const loadMoreItems = useCallback(() => {
         if (loadingMore || !hasMore) return;
 
@@ -166,6 +168,29 @@ export const ChunkedNearbyFeed = ({ onItemClick, onViewAll }: ChunkedNearbyFeedP
             setLoadingMore(false);
         }, LOAD_DELAY);
     }, [displayedItems.length, filteredItems, hasMore, loadingMore]);
+
+    // Intersection Observer for infinite scroll
+    useEffect(() => {
+        const sentinel = sentinelRef.current;
+        if (!sentinel || isLoading) return;
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting && hasMore && !loadingMore) {
+                    loadMoreItems();
+                }
+            },
+            {
+                root: null,
+                rootMargin: "200px", // Start loading 200px before reaching the end
+                threshold: 0,
+            }
+        );
+
+        observer.observe(sentinel);
+
+        return () => observer.disconnect();
+    }, [hasMore, loadingMore, isLoading, loadMoreItems]);
 
     // Calculate how many skeleton placeholders to show
     const remainingCount = Math.min(
@@ -251,28 +276,23 @@ export const ChunkedNearbyFeed = ({ onItemClick, onViewAll }: ChunkedNearbyFeedP
 
                                     {/* Bottom content overlay */}
                                     <div className="absolute bottom-0 left-0 right-0 p-5 gradient-card">
-                                        {/* Category */}
                                         <span className="text-xs bg-primary/90 px-3 py-1 rounded-full font-bold uppercase tracking-wide text-primary-foreground inline-block mb-3">
                                             {item.category}
                                         </span>
 
-                                        {/* Title */}
                                         <h3 className="text-xl font-extrabold leading-tight mb-2 text-foreground">
                                             {item.title}
                                         </h3>
 
-                                        {/* Location */}
                                         <div className="flex items-center gap-1 text-muted-foreground mb-3">
                                             <Icon name="location_on" size="sm" />
                                             <span className="text-sm">{item.location}</span>
                                         </div>
 
-                                        {/* Description */}
                                         <p className="text-sm text-muted-foreground line-clamp-2">
                                             {item.description}
                                         </p>
 
-                                        {/* Action button */}
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
@@ -288,7 +308,7 @@ export const ChunkedNearbyFeed = ({ onItemClick, onViewAll }: ChunkedNearbyFeedP
                             </div>
                         ))}
 
-                        {/* Loading skeleton placeholders for next chunk */}
+                        {/* Loading skeleton placeholders - shown automatically when loading more */}
                         {loadingMore && (
                             <>
                                 {Array.from({ length: remainingCount }).map((_, i) => (
@@ -297,17 +317,9 @@ export const ChunkedNearbyFeed = ({ onItemClick, onViewAll }: ChunkedNearbyFeedP
                             </>
                         )}
 
-                        {/* Load More Button */}
-                        {hasMore && !loadingMore && (
-                            <button
-                                onClick={loadMoreItems}
-                                className="mt-2 py-3 glass rounded-full text-center text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors press"
-                            >
-                                <span className="flex items-center justify-center gap-2">
-                                    <Icon name="expand_more" size="sm" />
-                                    Load More ({filteredItems.length - displayedItems.length} remaining)
-                                </span>
-                            </button>
+                        {/* Sentinel element for intersection observer - invisible trigger */}
+                        {hasMore && (
+                            <div ref={sentinelRef} className="h-4" aria-hidden="true" />
                         )}
 
                         {/* End message */}
