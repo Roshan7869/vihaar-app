@@ -1,186 +1,252 @@
 "use client";
 
+import { useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { BottomNav } from "@/components/nav/BottomNav";
+import { TransportCard, TransportOption } from "@/components/ui/TransportCard";
+import { Button } from "@/components/ui/Button";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
-const services = [
-    { icon: "two_wheeler", label: "Rent Bike" },
-    { icon: "car_rental", label: "Car Rental" },
-    { icon: "local_taxi", label: "Cab" },
-    { icon: "directions_bus", label: "Intercity" },
+// Mock Data
+const TRANSPORT_DATA: TransportOption[] = [
+    {
+        id: "1",
+        type: "bus",
+        provider: "Kanker Roadways",
+        name: "Luxury AC Sleeper (2+1)",
+        time: "09:00 PM - 06:00 AM",
+        price: "₹850",
+        rating: 4.5,
+        features: ["AC", "Blanket", "Charging Point", "Water"],
+        status: "fastest"
+    },
+    {
+        id: "2",
+        type: "bus",
+        provider: "Mahendra Travels",
+        name: "Semi Sleeper (2+2)",
+        time: "10:30 PM - 08:00 AM",
+        price: "₹650",
+        rating: 4.2,
+        features: ["Charging Point", "Reading Light"],
+        status: "cheapest"
+    },
+    {
+        id: "3",
+        type: "cab",
+        provider: "Uber Intercity",
+        name: "Sedan (Dzire/Etios)",
+        time: "On Demand",
+        price: "₹3,500",
+        rating: 4.8,
+        features: ["AC", "4 Seater", "Doorstep Pickup"],
+        status: "ontime"
+    },
+    {
+        id: "4",
+        type: "rental",
+        provider: "ZoomCar",
+        name: "Hyundai Creta",
+        time: "Self Drive",
+        price: "₹2,200/day",
+        rating: 4.6,
+        features: ["Manual", "Petrol", "5 Seater"],
+    }
+];
+
+const MODES = [
+    { id: "all", label: "All", icon: "dataset" },
+    { id: "bus", label: "Bus", icon: "directions_bus" },
+    { id: "cab", label: "Cab", icon: "local_taxi" },
+    { id: "rental", label: "Rental", icon: "car_rental" },
 ];
 
 export default function TravelPage() {
-    const handleOpenMaps = () => {
-        window.open(
-            "https://www.google.com/maps",
-            "_blank"
-        );
-    };
+    const [selectedMode, setSelectedMode] = useState("all");
+    const [source, setSource] = useState("Raipur");
+    const [destination, setDestination] = useState("Jagdalpur");
+
+    const filteredOptions = TRANSPORT_DATA.filter(item =>
+        selectedMode === "all" ? true : item.type === selectedMode
+    );
 
     return (
-        <div className="relative flex h-screen w-full flex-col overflow-hidden max-w-md mx-auto shadow-2xl bg-background">
-            {/* Background Glows */}
-            <div className="fixed top-[-10%] right-[-20%] w-[400px] h-[400px] bg-primary/20 rounded-full blur-[120px] pointer-events-none z-0" />
-            <div className="fixed bottom-[30%] left-[-20%] w-[300px] h-[300px] bg-amber-600/10 rounded-full blur-[100px] pointer-events-none z-0" />
-
-            {/* Header */}
-            <header className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-5">
-                <Link
-                    href="/"
-                    className="flex size-10 items-center justify-center rounded-full glass press"
-                >
-                    <Icon name="arrow_back" size="md" />
-                </Link>
-                <h2 className="text-foreground text-lg font-bold tracking-tight">Travel & Commute</h2>
-                <button className="flex size-10 items-center justify-center rounded-full glass press">
-                    <Icon name="notifications" size="md" />
-                </button>
-            </header>
-
-            {/* Main Content */}
-            <main className="flex flex-col h-full relative z-10 pt-20">
-                {/* Top Section - Services & Buses */}
-                <div className="h-[60%] flex flex-col px-6 space-y-6 pb-4 overflow-y-auto no-scrollbar">
-                    {/* Services Section */}
-                    <div>
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-foreground font-semibold text-lg">Services</h3>
-                            <span className="text-xs text-primary cursor-pointer">View all</span>
-                        </div>
-                        <div className="grid grid-cols-4 gap-3">
-                            {services.map((service) => (
-                                <div key={service.label} className="flex flex-col items-center gap-2 group cursor-pointer">
-                                    <div className="size-16 rounded-2xl glass flex items-center justify-center group-hover:bg-primary/20 transition-all duration-300 border border-white/5 group-hover:border-primary/30">
-                                        <Icon name={service.icon} className="text-amber-400 group-hover:text-white transition-colors" />
-                                    </div>
-                                    <span className="text-[10px] text-muted-foreground font-medium">{service.label}</span>
-                                </div>
-                            ))}
-                        </div>
+        <div className="min-h-screen bg-background pb-20 md:pb-0">
+            {/* Header - Mobile & Desktop */}
+            <header className="sticky top-0 z-40 glass-header border-b border-border/50">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <Link href="/" className="md:hidden flex items-center justify-center p-2 rounded-full hover:bg-muted transition-colors">
+                            <Icon name="arrow_back" size="md" />
+                        </Link>
+                        <h1 className="text-xl md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-orange-600">
+                            Travel & Commute
+                        </h1>
                     </div>
-
-                    {/* Ongoing Buses Section */}
-                    <div className="flex-1 min-h-0 flex flex-col">
-                        <div className="flex items-center justify-between mb-3">
-                            <h3 className="text-foreground font-semibold text-lg">Ongoing Buses</h3>
-                            <div className="flex gap-2 items-center">
-                                <span className="size-2 rounded-full bg-green-500 animate-pulse" />
-                                <span className="text-xs text-green-500 font-medium">Live Updates</span>
-                            </div>
-                        </div>
-
-                        {/* Bus Card */}
-                        <div className="glass rounded-3xl p-5 relative overflow-hidden group cursor-pointer hover:bg-white/5 transition-colors">
-                            <div className="absolute right-0 top-0 w-32 h-32 bg-gradient-to-br from-amber-300 to-amber-600 opacity-10 blur-3xl rounded-full" />
-
-                            {/* Bus Header */}
-                            <div className="flex justify-between items-start mb-6 relative z-10">
-                                <div className="flex items-center gap-3">
-                                    <div className="size-10 rounded-full bg-white/10 flex items-center justify-center">
-                                        <Icon name="directions_bus" size="md" />
-                                    </div>
-                                    <div>
-                                        <h4 className="text-foreground font-bold text-sm">Express 402</h4>
-                                        <p className="text-muted-foreground text-[10px]">AC Seater • WiFi</p>
-                                    </div>
-                                </div>
-                                <div className="px-2.5 py-1 rounded-full bg-primary/20 border border-primary/20">
-                                    <span className="text-primary text-[10px] font-bold tracking-wide">ON TIME</span>
-                                </div>
-                            </div>
-
-                            {/* Route Info */}
-                            <div className="relative z-10 flex items-center justify-between mb-6">
-                                <div className="flex flex-col">
-                                    <span className="text-2xl font-bold text-foreground">09:00</span>
-                                    <span className="text-xs text-muted-foreground mt-1">Raipur</span>
-                                </div>
-                                <div className="flex-1 mx-4 flex flex-col items-center gap-1">
-                                    <span className="text-[10px] text-muted-foreground">5h 30m</span>
-                                    <div className="w-full h-[2px] bg-white/10 relative">
-                                        <div className="absolute left-0 top-0 bottom-0 w-[60%] bg-gradient-to-r from-amber-300 to-amber-600 rounded-full shadow-[0_0_10px_rgba(252,211,77,0.5)]" />
-                                        <div className="absolute left-[60%] top-1/2 -translate-y-1/2 size-2 bg-white rounded-full shadow-lg" />
-                                    </div>
-                                </div>
-                                <div className="flex flex-col items-end">
-                                    <span className="text-2xl font-bold text-muted-foreground">14:30</span>
-                                    <span className="text-xs text-muted-foreground mt-1">Jagdalpur</span>
-                                </div>
-                            </div>
-
-                            {/* Footer */}
-                            <div className="flex items-center justify-between pt-4 border-t border-white/5 relative z-10">
-                                <div className="flex -space-x-2">
-                                    <div className="w-6 h-6 rounded-full bg-primary/30 border border-background flex items-center justify-center">
-                                        <Icon name="person" size="xs" className="text-primary" />
-                                    </div>
-                                    <div className="w-6 h-6 rounded-full bg-primary/20 border border-background flex items-center justify-center">
-                                        <Icon name="person" size="xs" className="text-primary/70" />
-                                    </div>
-                                    <div className="w-6 h-6 rounded-full bg-white/10 border border-background flex items-center justify-center text-[8px] text-foreground">+12</div>
-                                </div>
-                                <button className="flex items-center gap-1 text-primary text-xs font-bold group-hover:translate-x-1 transition-transform">
-                                    Book Seat <Icon name="arrow_forward" size="xs" />
-                                </button>
-                            </div>
+                    <div className="hidden md:flex items-center gap-4">
+                        <Button variant="ghost" size="sm">My Bookings</Button>
+                        <div className="size-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                            <Icon name="person" size="sm" />
                         </div>
                     </div>
                 </div>
+            </header>
 
-                {/* Map Section */}
-                <button
-                    onClick={handleOpenMaps}
-                    className="flex-1 w-full relative z-20 group overflow-hidden rounded-t-[2.5rem] shadow-[0_-8px_40px_rgba(0,0,0,0.6)] border-t border-white/10 bg-[#120c09]"
-                >
-                    {/* Map Pattern Background */}
-                    <div className="absolute inset-0 opacity-40" style={{
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-                    }} />
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-                    {/* Map Lines */}
-                    <div className="absolute inset-0 opacity-30">
-                        <div className="absolute top-0 left-1/3 w-2 h-full bg-[#3a2e28] rotate-12 transform origin-top" />
-                        <div className="absolute top-1/2 left-0 w-full h-3 bg-[#3a2e28] -rotate-6 transform origin-left" />
-                        <div className="absolute top-1/4 right-0 w-2/3 h-1 bg-[#2c221d]" />
-                        <div className="absolute bottom-1/3 left-1/4 w-1 h-1/2 bg-[#2c221d] rotate-45" />
-                    </div>
+                    {/* Left Column: Search & Filters */}
+                    <div className="lg:col-span-4 space-y-6">
+                        {/* Search Card */}
+                        <div className="bg-card rounded-3xl p-6 shadow-sm border border-border/50 relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -z-10" />
 
-                    {/* Your Location Marker */}
-                    <div className="absolute top-[40%] left-[45%] flex flex-col items-center z-10 group-hover:scale-110 transition-transform duration-500 ease-out">
-                        <div className="px-3 py-1.5 glass rounded-lg mb-2 shadow-lg border-primary/30">
-                            <span className="text-xs font-bold text-foreground whitespace-nowrap">Your Location</span>
+                            <h2 className="text-lg font-bold mb-6 flex items-center gap-2">
+                                <Icon name="route" className="text-primary" />
+                                Plan Your Journey
+                            </h2>
+
+                            <div className="space-y-4 relative">
+                                {/* Connector Line */}
+                                <div className="absolute left-[1.15rem] top-10 bottom-10 w-0.5 border-l-2 border-dashed border-border z-0" />
+
+                                <div className="relative z-10">
+                                    <label className="text-xs font-semibold text-muted-foreground ml-9 mb-1.5 block">From</label>
+                                    <div className="flex items-center gap-3">
+                                        <div className="size-4 rounded-full border-[3px] border-primary bg-background shrink-0" />
+                                        <div className="flex-1 h-12 bg-muted/50 rounded-xl px-4 flex items-center border border-transparent focus-within:border-primary/50 focus-within:bg-background transition-all">
+                                            <input
+                                                type="text"
+                                                value={source}
+                                                onChange={(e) => setSource(e.target.value)}
+                                                className="bg-transparent w-full outline-none text-sm font-semibold"
+                                                placeholder="Source City"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="relative z-10">
+                                    <label className="text-xs font-semibold text-muted-foreground ml-9 mb-1.5 block">To</label>
+                                    <div className="flex items-center gap-3">
+                                        <div className="size-4 rounded-full border-[3px] border-orange-600 bg-background shrink-0" />
+                                        <div className="flex-1 h-12 bg-muted/50 rounded-xl px-4 flex items-center border border-transparent focus-within:border-primary/50 focus-within:bg-background transition-all">
+                                            <input
+                                                type="text"
+                                                value={destination}
+                                                onChange={(e) => setDestination(e.target.value)}
+                                                className="bg-transparent w-full outline-none text-sm font-semibold"
+                                                placeholder="Destination City"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="mt-4 pt-4 border-t border-border/50 grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Date</label>
+                                    <div className="h-10 bg-muted/50 rounded-lg px-3 flex items-center">
+                                        <span className="text-sm font-medium">Tomorrow, 15 Oct</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Travelers</label>
+                                    <div className="h-10 bg-muted/50 rounded-lg px-3 flex items-center">
+                                        <span className="text-sm font-medium">1 Adult</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <Button className="w-full mt-6" size="lg">
+                                Search Options
+                            </Button>
                         </div>
-                        <div className="relative">
-                            <div className="absolute -inset-4 bg-primary/30 rounded-full animate-ping" />
-                            <div className="relative size-4 bg-primary rounded-full border-2 border-white shadow-[0_0_20px_rgba(223,89,32,0.8)]" />
+
+                        {/* Mode Toggles (Desktop hidden, Mobile visible inside form usually, but separating for clarity) */}
+                        <div className="hidden lg:block bg-card rounded-2xl p-4 shadow-sm border border-border/50">
+                            <h3 className="text-sm font-bold text-muted-foreground mb-3 uppercase tracking-wider">Transport Mode</h3>
+                            <div className="space-y-1">
+                                {MODES.map(mode => (
+                                    <button
+                                        key={mode.id}
+                                        onClick={() => setSelectedMode(mode.id)}
+                                        className={cn(
+                                            "w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all group",
+                                            selectedMode === mode.id
+                                                ? "bg-primary/10 text-primary"
+                                                : "hover:bg-muted text-muted-foreground hover:text-foreground"
+                                        )}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <Icon name={mode.icon} size="sm" />
+                                            {mode.label}
+                                        </div>
+                                        {selectedMode === mode.id && <Icon name="check" size="sm" />}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
 
-                    {/* Destination Markers */}
-                    <div className="absolute top-[60%] right-[20%] z-10">
-                        <Icon name="location_on" filled className="text-amber-500 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" size="lg" />
-                    </div>
-                    <div className="absolute top-[20%] left-[20%] z-10">
-                        <Icon name="location_on" filled className="text-white/40" />
-                    </div>
+                    {/* Right Column: Results */}
+                    <div className="lg:col-span-8">
+                        {/* Mobile Category Tabs */}
+                        <div className="lg:hidden flex gap-2 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 sticky top-16 z-30 bg-background/95 backdrop-blur-sm pt-2">
+                            {MODES.map(mode => (
+                                <button
+                                    key={mode.id}
+                                    onClick={() => setSelectedMode(mode.id)}
+                                    className={cn(
+                                        "flex-shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold border transition-all",
+                                        selectedMode === mode.id
+                                            ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20"
+                                            : "bg-card text-muted-foreground border-border"
+                                    )}
+                                >
+                                    <Icon name={mode.icon} size="xs" />
+                                    {mode.label}
+                                </button>
+                            ))}
+                        </div>
 
-                    {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent pointer-events-none" />
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-xl font-bold text-foreground">
+                                {filteredOptions.length} Options Available
+                            </h2>
+                            <button className="flex items-center gap-1 text-primary text-sm font-semibold">
+                                <Icon name="sort" size="sm" /> Sort by
+                            </button>
+                        </div>
 
-                    {/* Open in Maps Button */}
-                    <div className="absolute bottom-28 left-0 right-0 flex justify-center pointer-events-none">
-                        <div className="glass-nav px-5 py-2.5 rounded-full flex items-center gap-2 shadow-2xl border border-primary/20 pointer-events-auto group-active:scale-95 transition-transform">
-                            <Icon name="map" className="text-primary" size="md" />
-                            <span className="text-sm font-semibold text-foreground">Open in Maps</span>
+                        <div className="space-y-4">
+                            {filteredOptions.length > 0 ? (
+                                filteredOptions.map((option, idx) => (
+                                    <div
+                                        key={option.id}
+                                        className="animate-reveal-up"
+                                        style={{ animationDelay: `${idx * 0.1}s` }}
+                                    >
+                                        <TransportCard option={option} />
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="text-center py-20 bg-card rounded-3xl border border-dashed border-border">
+                                    <div className="size-16 bg-muted/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <Icon name="search_off" size="lg" className="text-muted-foreground" />
+                                    </div>
+                                    <p className="text-muted-foreground font-medium">No transport options found for this filter.</p>
+                                </div>
+                            )}
                         </div>
                     </div>
-                </button>
+                </div>
             </main>
 
-            {/* Bottom Navigation */}
-            <BottomNav />
+            <div className="md:hidden">
+                <BottomNav />
+            </div>
         </div>
     );
 }
