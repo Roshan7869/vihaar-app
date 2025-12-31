@@ -3,248 +3,254 @@
 import { useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { BottomNav } from "@/components/nav/BottomNav";
-import { TransportCard, TransportOption } from "@/components/ui/TransportCard";
-import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-// Mock Data
-const TRANSPORT_DATA: TransportOption[] = [
+// Mock Data for Functional List
+const BUS_DATA = [
     {
         id: "1",
-        type: "bus",
-        provider: "Kanker Roadways",
-        name: "Luxury AC Sleeper (2+1)",
-        time: "09:00 PM - 06:00 AM",
-        price: "₹850",
-        rating: 4.5,
-        features: ["AC", "Blanket", "Charging Point", "Water"],
-        status: "fastest"
+        name: "Express 402",
+        type: "AC Seater • WiFi",
+        status: "ON TIME",
+        departs: "09:00",
+        arrives: "14:30",
+        duration: "5h 30m",
+        source: "Raipur",
+        destination: "Jagdalpur",
+        seats: 12
     },
     {
         id: "2",
-        type: "bus",
-        provider: "Mahendra Travels",
-        name: "Semi Sleeper (2+2)",
-        time: "10:30 PM - 08:00 AM",
-        price: "₹650",
-        rating: 4.2,
-        features: ["Charging Point", "Reading Light"],
-        status: "cheapest"
+        name: "Kanker Royal",
+        type: "AC Sleeper (2+1)",
+        status: "DELAYED",
+        departs: "10:15",
+        arrives: "16:00",
+        duration: "5h 45m",
+        source: "Raipur",
+        destination: "Jagdalpur",
+        seats: 8
     },
     {
         id: "3",
-        type: "cab",
-        provider: "Uber Intercity",
-        name: "Sedan (Dzire/Etios)",
-        time: "On Demand",
-        price: "₹3,500",
-        rating: 4.8,
-        features: ["AC", "4 Seater", "Doorstep Pickup"],
-        status: "ontime"
+        name: "Mahindra Travels",
+        type: "Non-AC Seater",
+        status: "ON TIME",
+        departs: "11:30",
+        arrives: "17:30",
+        duration: "6h 00m",
+        source: "Durg",
+        destination: "Kondagaon",
+        seats: 24
     },
     {
         id: "4",
-        type: "rental",
-        provider: "ZoomCar",
-        name: "Hyundai Creta",
-        time: "Self Drive",
-        price: "₹2,200/day",
-        rating: 4.6,
-        features: ["Manual", "Petrol", "5 Seater"],
+        name: "Payal Travels",
+        type: "AC Sleeper",
+        status: "FASTEST",
+        departs: "22:00",
+        arrives: "05:00",
+        duration: "7h 00m",
+        source: "Raipur",
+        destination: "Bastar",
+        seats: 15
+    },
+    {
+        id: "5",
+        name: "Royal Cruiser",
+        type: "Volvo Multi-Axle",
+        status: "ON TIME",
+        departs: "23:00",
+        arrives: "06:00",
+        duration: "7h 00m",
+        source: "Raipur",
+        destination: "Jagdalpur",
+        seats: 32
     }
 ];
 
-const MODES = [
-    { id: "all", label: "All", icon: "dataset" },
-    { id: "bus", label: "Bus", icon: "directions_bus" },
-    { id: "cab", label: "Cab", icon: "local_taxi" },
-    { id: "rental", label: "Rental", icon: "car_rental" },
+const services = [
+    { icon: "two_wheeler", label: "Rent Bike" },
+    { icon: "car_rental", label: "Car Rental" },
+    { icon: "local_taxi", label: "Cab" },
+    { icon: "directions_bus", label: "Intercity" },
 ];
 
 export default function TravelPage() {
-    const [selectedMode, setSelectedMode] = useState("all");
-    const [source, setSource] = useState("Raipur");
-    const [destination, setDestination] = useState("Jagdalpur");
-
-    const filteredOptions = TRANSPORT_DATA.filter(item =>
-        selectedMode === "all" ? true : item.type === selectedMode
-    );
+    const handleOpenMaps = () => {
+        // Opens direction from Raipur to Jagdalpur (Example)
+        window.open(
+            "https://www.google.com/maps/dir/?api=1&origin=Raipur,+Chhattisgarh&destination=Jagdalpur,+Chhattisgarh&travelmode=driving",
+            "_blank"
+        );
+    };
 
     return (
-        <div className="min-h-screen bg-background pb-20 md:pb-0">
-            {/* Header - Mobile & Desktop */}
-            <header className="sticky top-0 z-40 glass-header border-b border-border/50">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <Link href="/" className="md:hidden flex items-center justify-center p-2 rounded-full hover:bg-muted transition-colors">
-                            <Icon name="arrow_back" size="md" />
-                        </Link>
-                        <h1 className="text-xl md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-orange-600">
-                            Travel & Commute
-                        </h1>
-                    </div>
-                    <div className="hidden md:flex items-center gap-4">
-                        <Button variant="ghost" size="sm">My Bookings</Button>
-                        <div className="size-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                            <Icon name="person" size="sm" />
-                        </div>
-                    </div>
-                </div>
+        <div className="relative flex h-screen w-full flex-col overflow-hidden max-w-md mx-auto shadow-2xl bg-[#0F0F0F]">
+            {/* Background Glows for Premium Dark Feel */}
+            <div className="fixed top-[-10%] right-[-20%] w-[400px] h-[400px] bg-primary/10 rounded-full blur-[120px] pointer-events-none z-0" />
+            <div className="fixed bottom-[30%] left-[-20%] w-[300px] h-[300px] bg-amber-600/5 rounded-full blur-[100px] pointer-events-none z-0" />
+
+            {/* Header */}
+            <header className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-5 bg-gradient-to-b from-[#0F0F0F] via-[#0F0F0F]/80 to-transparent">
+                <Link
+                    href="/"
+                    className="flex size-10 items-center justify-center rounded-full glass border border-white/5 press bg-black/40 text-white hover:bg-black/60 transition-colors"
+                >
+                    <Icon name="arrow_back" size="md" />
+                </Link>
+                <h2 className="text-white text-lg font-bold tracking-tight">Travel & Commute</h2>
+                <button className="flex size-10 items-center justify-center rounded-full glass border border-white/5 press bg-black/40 text-white hover:bg-black/60 transition-colors">
+                    <Icon name="notifications" size="md" />
+                </button>
             </header>
 
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Main Content Scrollable Area */}
+            <div className="flex-1 flex flex-col pt-24 overflow-y-auto no-scrollbar scroll-smooth">
 
-                    {/* Left Column: Search & Filters */}
-                    <div className="lg:col-span-4 space-y-6">
-                        {/* Search Card */}
-                        <div className="bg-card rounded-3xl p-6 shadow-sm border border-border/50 relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -z-10" />
-
-                            <h2 className="text-lg font-bold mb-6 flex items-center gap-2">
-                                <Icon name="route" className="text-primary" />
-                                Plan Your Journey
-                            </h2>
-
-                            <div className="space-y-4 relative">
-                                {/* Connector Line */}
-                                <div className="absolute left-[1.15rem] top-10 bottom-10 w-0.5 border-l-2 border-dashed border-border z-0" />
-
-                                <div className="relative z-10">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-9 mb-1.5 block">From</label>
-                                    <div className="flex items-center gap-3">
-                                        <div className="size-4 rounded-full border-[3px] border-primary bg-background shrink-0" />
-                                        <div className="flex-1 h-12 bg-muted/50 rounded-xl px-4 flex items-center border border-transparent focus-within:border-primary/50 focus-within:bg-background transition-all">
-                                            <input
-                                                type="text"
-                                                value={source}
-                                                onChange={(e) => setSource(e.target.value)}
-                                                className="bg-transparent w-full outline-none text-sm font-semibold"
-                                                placeholder="Source City"
-                                            />
-                                        </div>
-                                    </div>
+                {/* Services Section */}
+                <div className="px-6 mb-8 shrink-0">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-white font-semibold text-lg tracking-wide">Services</h3>
+                        <span className="text-xs text-primary cursor-pointer hover:underline font-medium">View all</span>
+                    </div>
+                    <div className="grid grid-cols-4 gap-3">
+                        {services.map((service) => (
+                            <div key={service.label} className="flex flex-col items-center gap-2 group cursor-pointer">
+                                <div className="size-16 rounded-2xl bg-[#1A1A1A] border border-white/5 flex items-center justify-center group-hover:bg-primary/20 transition-all duration-300 group-hover:border-primary/30 shadow-lg group-hover:scale-105 group-active:scale-95">
+                                    <Icon name={service.icon} className="text-amber-400 group-hover:text-white transition-colors" size="md" />
                                 </div>
-
-                                <div className="relative z-10">
-                                    <label className="text-xs font-semibold text-muted-foreground ml-9 mb-1.5 block">To</label>
-                                    <div className="flex items-center gap-3">
-                                        <div className="size-4 rounded-full border-[3px] border-orange-600 bg-background shrink-0" />
-                                        <div className="flex-1 h-12 bg-muted/50 rounded-xl px-4 flex items-center border border-transparent focus-within:border-primary/50 focus-within:bg-background transition-all">
-                                            <input
-                                                type="text"
-                                                value={destination}
-                                                onChange={(e) => setDestination(e.target.value)}
-                                                className="bg-transparent w-full outline-none text-sm font-semibold"
-                                                placeholder="Destination City"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
+                                <span className="text-[10px] text-gray-400 font-medium whitespace-nowrap group-hover:text-gray-300 transition-colors">{service.label}</span>
                             </div>
+                        ))}
+                    </div>
+                </div>
 
-                            <div className="mt-4 pt-4 border-t border-border/50 grid grid-cols-2 gap-3">
-                                <div>
-                                    <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Date</label>
-                                    <div className="h-10 bg-muted/50 rounded-lg px-3 flex items-center">
-                                        <span className="text-sm font-medium">Tomorrow, 15 Oct</span>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Travelers</label>
-                                    <div className="h-10 bg-muted/50 rounded-lg px-3 flex items-center">
-                                        <span className="text-sm font-medium">1 Adult</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <Button className="w-full mt-6" size="lg">
-                                Search Options
-                            </Button>
-                        </div>
-
-                        {/* Mode Toggles (Desktop hidden, Mobile visible inside form usually, but separating for clarity) */}
-                        <div className="hidden lg:block bg-card rounded-2xl p-4 shadow-sm border border-border/50">
-                            <h3 className="text-sm font-bold text-muted-foreground mb-3 uppercase tracking-wider">Transport Mode</h3>
-                            <div className="space-y-1">
-                                {MODES.map(mode => (
-                                    <button
-                                        key={mode.id}
-                                        onClick={() => setSelectedMode(mode.id)}
-                                        className={cn(
-                                            "w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all group",
-                                            selectedMode === mode.id
-                                                ? "bg-primary/10 text-primary"
-                                                : "hover:bg-muted text-muted-foreground hover:text-foreground"
-                                        )}
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <Icon name={mode.icon} size="sm" />
-                                            {mode.label}
-                                        </div>
-                                        {selectedMode === mode.id && <Icon name="check" size="sm" />}
-                                    </button>
-                                ))}
-                            </div>
+                {/* Ongoing Buses List Section */}
+                <div className="px-6 pb-40"> {/* Extra padding bottom for Map overlap to ensure visible scroll end */}
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-white font-semibold text-lg tracking-wide">Ongoing Buses</h3>
+                        <div className="flex gap-2 items-center bg-green-500/10 px-2 py-1 rounded-full border border-green-500/20">
+                            <span className="size-1.5 rounded-full bg-green-500 animate-pulse" />
+                            <span className="text-[10px] text-green-500 font-bold uppercase tracking-wider">Live Updates</span>
                         </div>
                     </div>
 
-                    {/* Right Column: Results */}
-                    <div className="lg:col-span-8">
-                        {/* Mobile Category Tabs */}
-                        <div className="lg:hidden flex gap-2 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 sticky top-16 z-30 bg-background/95 backdrop-blur-sm pt-2">
-                            {MODES.map(mode => (
-                                <button
-                                    key={mode.id}
-                                    onClick={() => setSelectedMode(mode.id)}
-                                    className={cn(
-                                        "flex-shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold border transition-all",
-                                        selectedMode === mode.id
-                                            ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20"
-                                            : "bg-card text-muted-foreground border-border"
-                                    )}
-                                >
-                                    <Icon name={mode.icon} size="xs" />
-                                    {mode.label}
-                                </button>
-                            ))}
-                        </div>
+                    <div className="space-y-4">
+                        {BUS_DATA.map((bus, idx) => (
+                            <div
+                                key={bus.id}
+                                className="bg-[#1A1A1A]/80 backdrop-blur-md border border-white/5 rounded-3xl p-5 relative overflow-hidden group cursor-pointer hover:bg-[#252525] transition-all duration-300 hover:border-white/10 hover:shadow-xl active:scale-[0.98]"
+                                style={{ animationDelay: `${idx * 100}ms` }}
+                            >
+                                {/* Decor */}
+                                <div className="absolute right-0 top-0 w-32 h-32 bg-gradient-to-br from-amber-500/5 to-transparent rounded-bl-full pointer-events-none group-hover:from-amber-500/10 transition-colors" />
 
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xl font-bold text-foreground">
-                                {filteredOptions.length} Options Available
-                            </h2>
-                            <button className="flex items-center gap-1 text-primary text-sm font-semibold">
-                                <Icon name="sort" size="sm" /> Sort by
-                            </button>
-                        </div>
-
-                        <div className="space-y-4">
-                            {filteredOptions.length > 0 ? (
-                                filteredOptions.map((option, idx) => (
-                                    <div
-                                        key={option.id}
-                                        className="animate-reveal-up"
-                                        style={{ animationDelay: `${idx * 0.1}s` }}
-                                    >
-                                        <TransportCard option={option} />
+                                {/* Bus Header */}
+                                <div className="flex justify-between items-start mb-6 relative z-10">
+                                    <div className="flex items-center gap-3">
+                                        <div className="size-10 rounded-full bg-white/5 flex items-center justify-center border border-white/5 group-hover:bg-white/10 transition-colors">
+                                            <Icon name="directions_bus" size="md" className="text-gray-300 group-hover:text-white transition-colors" />
+                                        </div>
+                                        <div>
+                                            <h4 className="text-white font-bold text-sm tracking-wide">{bus.name}</h4>
+                                            <p className="text-gray-500 text-[10px] font-medium">{bus.type}</p>
+                                        </div>
                                     </div>
-                                ))
-                            ) : (
-                                <div className="text-center py-20 bg-card rounded-3xl border border-dashed border-border">
-                                    <div className="size-16 bg-muted/50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <Icon name="search_off" size="lg" className="text-muted-foreground" />
+                                    <div className={cn(
+                                        "px-2.5 py-1 rounded-full border text-[10px] font-bold tracking-wide shadow-sm",
+                                        bus.status === "ON TIME" ? "bg-primary/10 border-primary/20 text-primary shadow-primary/10" :
+                                            bus.status === "FASTEST" ? "bg-blue-500/10 border-blue-500/20 text-blue-400 shadow-blue-500/10" :
+                                                "bg-red-500/10 border-red-500/20 text-red-400 shadow-red-500/10"
+                                    )}>
+                                        {bus.status}
                                     </div>
-                                    <p className="text-muted-foreground font-medium">No transport options found for this filter.</p>
                                 </div>
-                            )}
+
+                                {/* Route Info */}
+                                <div className="relative z-10 flex items-center justify-between mb-6">
+                                    <div className="flex flex-col">
+                                        <span className="text-2xl font-bold text-white tracking-tight">{bus.departs}</span>
+                                        <span className="text-xs text-gray-500 mt-1 font-medium">{bus.source}</span>
+                                    </div>
+                                    <div className="flex-1 mx-4 flex flex-col items-center gap-1">
+                                        <span className="text-[10px] text-gray-500 font-medium">{bus.duration}</span>
+                                        <div className="w-full h-[2px] bg-white/10 relative rounded-full overflow-hidden">
+                                            <div className="absolute left-0 top-0 bottom-0 w-[60%] bg-gradient-to-r from-amber-600 to-amber-400 rounded-full shadow-[0_0_8px_rgba(251,191,36,0.5)]" />
+                                            <div className="absolute left-[60%] top-1/2 -translate-y-1/2 size-2 bg-white rounded-full shadow-lg border-2 border-amber-500" />
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col items-end">
+                                        <span className="text-2xl font-bold text-gray-400 tracking-tight">{bus.arrives}</span>
+                                        <span className="text-xs text-gray-500 mt-1 font-medium">{bus.destination}</span>
+                                    </div>
+                                </div>
+
+                                {/* Footer */}
+                                <div className="flex items-center justify-between pt-4 border-t border-white/5 relative z-10">
+                                    <div className="flex -space-x-2">
+                                        {[1, 2, 3].map((i) => (
+                                            <div key={i} className="w-6 h-6 rounded-full bg-neutral-800 border border-[#1A1A1A] flex items-center justify-center ring-2 ring-[#1A1A1A]">
+                                                <Icon name="person" size="xs" className="text-gray-500" />
+                                            </div>
+                                        ))}
+                                        <div className="w-6 h-6 rounded-full bg-neutral-800 border border-[#1A1A1A] flex items-center justify-center text-[8px] text-gray-400 ring-2 ring-[#1A1A1A]">+{bus.seats}</div>
+                                    </div>
+                                    <button className="flex items-center gap-1 text-primary text-xs font-bold group-hover:translate-x-1 transition-transform uppercase tracking-wider">
+                                        Book Seat <Icon name="arrow_forward" size="xs" />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+
+                        {/* More Loading Skeleton / Space filler */}
+                        <div className="py-4 flex flex-col items-center justify-center gap-2 opacity-50">
+                            <div className="flex gap-1">
+                                <span className="size-1.5 bg-gray-600 rounded-full animate-bounce delay-0" />
+                                <span className="size-1.5 bg-gray-600 rounded-full animate-bounce delay-100" />
+                                <span className="size-1.5 bg-gray-600 rounded-full animate-bounce delay-200" />
+                            </div>
+                            <span className="text-[10px] text-gray-600 font-medium uppercase tracking-widest">End of List</span>
                         </div>
                     </div>
                 </div>
-            </main>
+            </div>
 
-            <div className="md:hidden">
+            {/* Map Section - Fixed Bottom Panel */}
+            <div
+                className="absolute bottom-0 left-0 right-0 z-40 bg-[#120c09] transition-transform duration-300 rounded-t-[2.5rem] shadow-[0_-8px_40px_rgba(0,0,0,0.8)] border-t border-white/10 h-[100px] mb-[64px]" /* mb-[64px] clears Navbar */
+            >
+                <button
+                    onClick={handleOpenMaps}
+                    className="w-full h-full relative group overflow-hidden rounded-t-[2.5rem] focus:outline-none"
+                    aria-label="Open in Maps"
+                >
+                    {/* Map Pattern Background */}
+                    <div className="absolute inset-0 opacity-30 transition-opacity duration-300 group-hover:opacity-40" style={{
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+                    }} />
+
+                    {/* Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent pointer-events-none" />
+
+                    {/* Open in Maps Button */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="glass-nav px-6 py-3 rounded-full flex items-center gap-2 shadow-2xl border border-primary/20 pointer-events-auto group-active:scale-95 transition-all duration-300 bg-[#1A1A1A]/90 group-hover:bg-primary group-hover:border-primary">
+                            <Icon name="map" className="text-primary group-hover:text-white transition-colors" size="md" />
+                            <span className="text-sm font-semibold text-white">Open in Maps</span>
+                        </div>
+                    </div>
+
+                    {/* Map Marker Decoration */}
+                    <div className="absolute top-[20%] left-[20%] opacity-0 group-hover:opacity-100 transition-all duration-500 delay-100 -translate-y-2 group-hover:translate-y-0">
+                        <Icon name="location_on" filled className="text-amber-500 drop-shadow-lg" />
+                    </div>
+                </button>
+            </div>
+
+            {/* Bottom Navigation */}
+            <div className="relative z-50">
                 <BottomNav />
             </div>
         </div>
