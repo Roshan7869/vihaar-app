@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { ProgressiveImage } from "@/components/ui/ProgressiveImage";
+import { DestinationCard } from "@/components/ui/DestinationCard";
 
 interface FeaturedItem {
     id: string;
@@ -153,56 +154,19 @@ export const FeaturedCarousel = ({ onExplore }: FeaturedCarouselProps) => {
                     }}
                 >
                     {featuredItems.map((item, index) => (
-                        <div key={item.id} className="w-full flex-shrink-0">
-                            <div className="relative aspect-[4/3] overflow-hidden">
-                                <ProgressiveImage
-                                    src={item.image}
-                                    alt={item.title}
-                                    fill
-                                    sizes="(max-width: 420px) 100vw, 420px"
-                                    className="object-cover pointer-events-none"
-                                    priority={index === 0}
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-
-                                <div className="absolute bottom-0 left-0 right-0 p-5">
-                                    {/* Category badges */}
-                                    <div className="flex gap-2 mb-3">
-                                        {item.categories.map((category) => (
-                                            <span
-                                                key={category}
-                                                className="text-[10px] bg-primary/90 px-3 py-1 rounded-full font-bold uppercase tracking-wide text-primary-foreground"
-                                            >
-                                                {category}
-                                            </span>
-                                        ))}
-                                    </div>
-
-                                    {/* Title */}
-                                    <h3 className="text-2xl font-extrabold leading-tight mb-2 text-foreground">
-                                        {item.title}
-                                    </h3>
-
-                                    {/* Location */}
-                                    <div className="flex items-center gap-1 text-muted-foreground mb-3">
-                                        <Icon name="location_on" size="sm" />
-                                        <span className="text-sm">{item.location}</span>
-                                    </div>
-
-                                    {/* Description */}
-                                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                                        {item.description}
-                                    </p>
-
-                                    {/* Explore button */}
-                                    <button
-                                        onClick={() => onExplore?.(item.id)}
-                                        className="bg-primary text-primary-foreground px-6 py-2.5 rounded-full font-bold text-sm press transition-all hover:bg-primary/90"
-                                    >
-                                        Explore Now
-                                    </button>
-                                </div>
-                            </div>
+                        <div key={item.id} className="w-full flex-shrink-0 px-1">
+                            <DestinationCard
+                                featured={true}
+                                title={item.title}
+                                imageUrl={item.image}
+                                location={item.location}
+                                description={item.description}
+                                badge={item.categories[0]}
+                                onClick={() => {
+                                    if (!isDragging) onExplore?.(item.id);
+                                }}
+                                className="w-full h-auto aspect-[4/3] shadow-lg"
+                            />
                         </div>
                     ))}
                 </div>

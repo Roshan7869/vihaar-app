@@ -14,7 +14,7 @@ export const TopBar = ({ onSearchClick }: TopBarProps) => {
             </h1>
             <button
                 onClick={onSearchClick}
-                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/5 transition-colors press"
+                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-muted transition-colors press"
             >
                 <Icon name="search" />
             </button>

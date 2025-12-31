@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { ProgressiveImage } from "@/components/ui/ProgressiveImage";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { DestinationCard } from "@/components/ui/DestinationCard";
 import { cn } from "@/lib/utils";
 
 interface NearbyItem {
@@ -211,16 +212,16 @@ export const ChunkedNearbyFeed = ({ onItemClick, onViewAll, onLoadComplete }: Ch
             </div>
 
             {/* Category Filter Tabs */}
-            <div className="flex gap-2 mb-5 overflow-x-auto pb-2 no-scrollbar -mx-5 px-5">
+            <div className="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar -mx-5 px-5">
                 {categories.map((cat) => (
                     <button
                         key={cat.id}
                         onClick={() => setActiveCategory(cat.id)}
                         className={cn(
-                            "flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all press",
+                            "flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all duration-200 border",
                             activeCategory === cat.id
-                                ? "bg-primary text-primary-foreground"
-                                : "glass text-muted-foreground hover:text-foreground"
+                                ? "bg-primary text-primary-foreground border-primary shadow-md transform scale-105"
+                                : "bg-card text-muted-foreground border-border hover:border-primary hover:text-primary hover:bg-primary/5"
                         )}
                     >
                         <Icon name={cat.icon} size="xs" />
@@ -229,7 +230,7 @@ export const ChunkedNearbyFeed = ({ onItemClick, onViewAll, onLoadComplete }: Ch
                 ))}
             </div>
 
-            <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {/* Initial loading state */}
                 {isLoading ? (
                     <>
@@ -237,7 +238,7 @@ export const ChunkedNearbyFeed = ({ onItemClick, onViewAll, onLoadComplete }: Ch
                         <NearbyItemSkeleton />
                     </>
                 ) : displayedItems.length === 0 ? (
-                    <div className="text-center py-12 text-muted-foreground">
+                    <div className="text-center py-12 text-muted-foreground col-span-full">
                         <Icon name="search_off" size="lg" className="mx-auto mb-2 opacity-50" />
                         <p>No places found in this category</p>
                     </div>
@@ -247,67 +248,20 @@ export const ChunkedNearbyFeed = ({ onItemClick, onViewAll, onLoadComplete }: Ch
                         {displayedItems.map((item, index) => (
                             <div
                                 key={item.id}
-                                onClick={() => onItemClick?.(item.id)}
-                                className="glass rounded-3xl overflow-hidden cursor-pointer group card-hover animate-reveal-up"
+                                className="animate-reveal-up"
                                 style={{
                                     animationDelay: `${(index % CHUNK_SIZE) * 0.1}s`,
-                                    opacity: 0
                                 }}
                             >
-                                <div className="relative">
-                                    <div className="relative aspect-[15/16] overflow-hidden">
-                                        <ProgressiveImage
-                                            src={item.image}
-                                            alt={item.title}
-                                            fill
-                                            sizes="(max-width: 420px) 100vw, 420px"
-                                            className="object-cover card-image"
-                                        />
-                                    </div>
-
-                                    {/* Top overlay with rating */}
-                                    <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
-                                        <div className="glass px-3 py-1.5 rounded-full flex items-center gap-1">
-                                            <Icon name="star" size="sm" className="text-yellow-400" filled />
-                                            <span className="text-sm font-bold text-foreground">{item.rating}</span>
-                                        </div>
-                                        <div className="glass px-3 py-1.5 rounded-full flex items-center gap-1">
-                                            <Icon name="near_me" size="sm" className="text-primary" />
-                                            <span className="text-sm font-medium text-foreground">{item.distance}</span>
-                                        </div>
-                                    </div>
-
-                                    {/* Bottom content overlay */}
-                                    <div className="absolute bottom-0 left-0 right-0 p-5 gradient-card">
-                                        <span className="text-xs bg-primary/90 px-3 py-1 rounded-full font-bold uppercase tracking-wide text-primary-foreground inline-block mb-3">
-                                            {item.category}
-                                        </span>
-
-                                        <h3 className="text-xl font-extrabold leading-tight mb-2 text-foreground">
-                                            {item.title}
-                                        </h3>
-
-                                        <div className="flex items-center gap-1 text-muted-foreground mb-3">
-                                            <Icon name="location_on" size="sm" />
-                                            <span className="text-sm">{item.location}</span>
-                                        </div>
-
-                                        <p className="text-sm text-muted-foreground line-clamp-2">
-                                            {item.description}
-                                        </p>
-
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                onItemClick?.(item.id);
-                                            }}
-                                            className="mt-4 bg-primary text-primary-foreground px-5 py-2 rounded-full font-bold text-sm press transition-all hover:bg-primary/90 flex items-center gap-2"
-                                        >
-                                            <Icon name="explore" size="sm" />
-                                            Explore
-                                        </button>
-                                    </div>
-                                </div>
+                                <DestinationCard
+                                    title={item.title}
+                                    imageUrl={item.image}
+                                    rating={item.rating}
+                                    location={item.location}
+                                    description={item.description}
+                                    badge={item.category}
+                                    onClick={() => onItemClick?.(item.id)}
+                                />
                             </div>
                         ))}
 

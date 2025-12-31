@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans, Dancing_Script } from "next/font/google";
+import { Plus_Jakarta_Sans, Dancing_Script, Inter } from "next/font/google";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import "./globals.css";
 
@@ -7,7 +7,15 @@ import "./globals.css";
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-display",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+  preload: true,
+});
+
+const inter = Inter({
+  variable: "--font-body",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
   display: "swap",
   preload: true,
 });
@@ -47,7 +55,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
         {/* ========== DNS PREFETCH (Lowest Priority) ========== */}
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
@@ -68,7 +76,7 @@ export default function RootLayout({
         {/* <link rel="preload" as="image" href="/hero.webp" type="image/webp" /> */}
       </head>
       <body
-        className={`${plusJakarta.variable} ${dancingScript.variable} font-display bg-[#201612] text-white antialiased selection:bg-primary selection:text-black`}
+        className={`${plusJakarta.variable} ${inter.variable} ${dancingScript.variable} font-sans bg-background text-foreground antialiased selection:bg-primary selection:text-white`}
         suppressHydrationWarning
       >
         <ErrorBoundary>
