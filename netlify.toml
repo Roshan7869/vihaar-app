@@ -1,6 +1,6 @@
 [build]
   command = "npm run build"
-  publish = ".next"
-
+  # publish = ".next"  <-- Commented out to let Netlify Next.js Runtime auto-detect
+  
 [dev]
   command = "npm run dev"
