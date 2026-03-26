@@ -2,92 +2,39 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Icon } from "@/components/ui/Icon";
-import { ProgressiveImage } from "@/components/ui/ProgressiveImage";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { DestinationCard } from "@/components/ui/DestinationCard";
 import { cn } from "@/lib/utils";
+import { bhilaiPlaces, hiddenGems } from "@/lib/data";
+import { Place } from "@/types";
 
-interface NearbyItem {
-    id: string;
-    image: string;
-    rating: number;
-    category: string;
-    title: string;
-    location: string;
-    distance: string;
-    description: string;
-}
-
-const allNearbyItems: NearbyItem[] = [
-    {
-        id: "1",
-        image: "https://images.unsplash.com/photo-1584559582128-b8be739912e4?w=800",
-        rating: 4.8,
-        category: "Temple",
-        title: "Danteshwari Temple",
-        location: "Dantewada, Chhattisgarh",
-        distance: "2.5 km",
-        description: "One of the 52 Shakti Peeths, dedicated to Goddess Danteshwari, the presiding deity of Bastar.",
-    },
-    {
-        id: "2",
-        image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800",
-        rating: 4.5,
-        category: "Nature",
-        title: "Kanger Valley National Park",
-        location: "Jagdalpur, Chhattisgarh",
-        distance: "12 km",
-        description: "Biosphere reserve with limestone caves, waterfalls, and diverse flora fauna including hill mynas.",
-    },
-    {
-        id: "3",
-        image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800",
-        rating: 4.2,
-        category: "Food",
-        title: "Tribal Kitchen",
-        location: "Jagdalpur Market, Chhattisgarh",
-        distance: "0.8 km",
-        description: "Authentic Bastar tribal cuisine featuring local delicacies like bamboo chicken and red ant chutney.",
-    },
-    {
-        id: "4",
-        image: "https://images.unsplash.com/photo-1566127444979-b3d2b654e3d7?w=800",
-        rating: 4.6,
-        category: "Museum",
-        title: "Anthropological Museum",
-        location: "Jagdalpur, Chhattisgarh",
-        distance: "3.2 km",
-        description: "Showcasing rich tribal heritage, artifacts, and cultural traditions of Bastar region.",
-    },
-    {
-        id: "5",
-        image: "https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=800",
-        rating: 4.9,
-        category: "Nature",
-        title: "Tirathgarh Falls",
-        location: "Jagdalpur, Chhattisgarh",
-        distance: "8 km",
-        description: "A 300ft cascading waterfall through lush green forests, perfect for nature photography.",
-    },
-    {
-        id: "6",
-        image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800",
-        rating: 4.4,
-        category: "Nature",
-        title: "Kutumsar Cave",
-        location: "Kanger Valley, Chhattisgarh",
-        distance: "15 km",
-        description: "One of the longest natural caves in India with stunning stalactite and stalagmite formations.",
-    },
+// Merge bhilai places and hidden gems (de-duped) for the nearby feed
+const allNearbyPlaces: Place[] = [
+    ...bhilaiPlaces,
+    ...hiddenGems.filter((h) => !bhilaiPlaces.some((b) => b.id === h.id)),
 ];
+
+const categoryMap: Record<string, string> = {
+    temple: "Temple",
+    nature: "Nature",
+    food: "Food",
+    heritage: "Heritage",
+    festival: "Festival",
+    tribal: "Tribal",
+    caves: "Caves",
+    waterfalls: "Nature",
+    historical: "Heritage",
+    art_craft: "Art & Craft",
+    event: "Events",
+};
 
 const categories = [
     { id: "all", label: "All", icon: "category" },
-    { id: "Temple", label: "Temple", icon: "temple_hindu" },
-    { id: "Nature", label: "Nature", icon: "forest" },
-    { id: "Food", label: "Food", icon: "restaurant" },
-    { id: "Museum", label: "Museum", icon: "museum" },
-    { id: "Heritage", label: "Heritage", icon: "account_balance" },
+    { id: "temple", label: "Temple", icon: "temple_hindu" },
+    { id: "nature", label: "Nature", icon: "forest" },
+    { id: "food", label: "Food", icon: "restaurant" },
+    { id: "heritage", label: "Heritage", icon: "account_balance" },
+    { id: "tribal", label: "Tribal", icon: "diversity_3" },
 ];
 
 // Configuration for chunk loading
@@ -127,7 +74,7 @@ function NearbyItemSkeleton() {
 
 export const ChunkedNearbyFeed = ({ onItemClick, onViewAll, onLoadComplete }: ChunkedNearbyFeedProps) => {
     const [activeCategory, setActiveCategory] = useState("all");
-    const [displayedItems, setDisplayedItems] = useState<NearbyItem[]>([]);
+    const [displayedItems, setDisplayedItems] = useState<Place[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
 
@@ -136,8 +83,16 @@ export const ChunkedNearbyFeed = ({ onItemClick, onViewAll, onLoadComplete }: Ch
 
     // Get filtered items based on category
     const filteredItems = activeCategory === "all"
-        ? allNearbyItems
-        : allNearbyItems.filter(item => item.category === activeCategory);
+        ? allNearbyPlaces
+        : allNearbyPlaces.filter((item) => {
+            if (activeCategory === "nature") {
+                return item.category === "nature" || item.category === "waterfalls" || item.category === "caves";
+            }
+            if (activeCategory === "heritage") {
+                return item.category === "heritage" || item.category === "historical";
+            }
+            return item.category === activeCategory;
+        });
 
     // Check if there are more items to load
     const hasMore = displayedItems.length < filteredItems.length;
@@ -154,6 +109,7 @@ export const ChunkedNearbyFeed = ({ onItemClick, onViewAll, onLoadComplete }: Ch
         }, LOAD_DELAY);
 
         return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeCategory]);
 
     // Load more items function
@@ -206,17 +162,23 @@ export const ChunkedNearbyFeed = ({ onItemClick, onViewAll, onLoadComplete }: Ch
                 <button
                     onClick={onViewAll}
                     className="text-primary text-sm font-semibold press"
+                    aria-label="View all nearby places"
                 >
                     View All
                 </button>
             </div>
 
             {/* Category Filter Tabs */}
-            <div className="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar -mx-5 px-5">
+            <div
+                className="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar -mx-5 px-5"
+                role="group"
+                aria-label="Filter by category"
+            >
                 {categories.map((cat) => (
                     <button
                         key={cat.id}
                         onClick={() => setActiveCategory(cat.id)}
+                        aria-pressed={activeCategory === cat.id}
                         className={cn(
                             "flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all duration-200 border",
                             activeCategory === cat.id
@@ -255,11 +217,11 @@ export const ChunkedNearbyFeed = ({ onItemClick, onViewAll, onLoadComplete }: Ch
                             >
                                 <DestinationCard
                                     title={item.title}
-                                    imageUrl={item.image}
+                                    imageUrl={item.images[0]}
                                     rating={item.rating}
                                     location={item.location}
-                                    description={item.description}
-                                    badge={item.category}
+                                    description={item.short_description ?? item.description}
+                                    badge={categoryMap[item.category] ?? item.category}
                                     onClick={() => onItemClick?.(item.id)}
                                 />
                             </div>
@@ -281,8 +243,8 @@ export const ChunkedNearbyFeed = ({ onItemClick, onViewAll, onLoadComplete }: Ch
 
                         {/* End message */}
                         {!hasMore && displayedItems.length > 0 && (
-                            <p className="text-center text-sm text-muted-foreground/50 py-2">
-                                You've seen all places
+                            <p className="text-center text-sm text-muted-foreground/50 py-2 col-span-full">
+                                You&apos;ve seen all places
                             </p>
                         )}
                     </>
