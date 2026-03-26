@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans, Dancing_Script, Inter } from "next/font/google";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { SavedProvider } from "@/context/SavedContext";
 import "./globals.css";
 
 // Optimize font loading with display swap and preload
@@ -40,6 +41,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_IN",
   },
+  manifest: "/manifest.webmanifest",
 };
 
 export const viewport: Viewport = {
@@ -80,7 +82,9 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <ErrorBoundary>
-          {children}
+          <SavedProvider>
+            {children}
+          </SavedProvider>
         </ErrorBoundary>
       </body>
     </html>

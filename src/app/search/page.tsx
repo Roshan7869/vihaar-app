@@ -1,70 +1,62 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { ProgressiveImage } from "@/components/ui/ProgressiveImage";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { BottomNav } from "@/components/nav/BottomNav";
 import { cn } from "@/lib/utils";
+import { hiddenGems, allExplorePlaces } from "@/lib/data";
+import { Place } from "@/types";
 import Link from "next/link";
-
-interface SearchResult {
-    id: string;
-    image: string;
-    category: string;
-    title: string;
-    location: string;
-}
 
 const filters = ["All", "Trending", "Near You", "Top Rated", "Events"];
 
-const searchResults: SearchResult[] = [
-    {
-        id: "1",
-        image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=400",
-        category: "Nature",
-        title: "Chitrakote Falls",
-        location: "Bastar, CG",
-    },
-    {
-        id: "2",
-        image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400",
-        category: "Mountains",
-        title: "Valley of Flowers",
-        location: "Uttarakhand",
-    },
-    {
-        id: "3",
-        image: "https://images.unsplash.com/photo-1584559582128-b8be739912e4?w=400",
-        category: "Heritage",
-        title: "Bhoramdeo Temple",
-        location: "Kawardha, CG",
-    },
-    {
-        id: "4",
-        image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=400",
-        category: "Wildlife",
-        title: "Kanger Valley",
-        location: "Jagdalpur, CG",
-    },
-    {
-        id: "5",
-        image: "https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=400",
-        category: "Nature",
-        title: "Tirathgarh Falls",
-        location: "Bastar, CG",
-    },
-    {
-        id: "6",
-        image: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400",
-        category: "Adventure",
-        title: "Coorg Trails",
-        location: "Karnataka",
-    },
+// Combined searchable places from all datasets
+const allPlaces: Place[] = [
+    ...hiddenGems,
+    ...allExplorePlaces.filter(
+        (p) => !hiddenGems.some((h) => h.id === p.id)
+    ),
 ];
 
-const INITIAL_LOAD = 4;
-const LOAD_DELAY = 200;
+function sanitize(input: string): string {
+    return input.replace(/[<>"'&]/g, "").trim();
+}
+
+function filterPlaces(places: Place[], query: string, filter: string): Place[] {
+    const q = sanitize(query).toLowerCase();
+
+    return places.filter((place) => {
+        // Text search
+        const matchesQuery =
+            !q ||
+            place.title.toLowerCase().includes(q) ||
+            (place.subtitle ?? "").toLowerCase().includes(q) ||
+            place.location.toLowerCase().includes(q) ||
+            place.district.toLowerCase().includes(q) ||
+            place.category.toLowerCase().includes(q) ||
+            (place.tags ?? []).some((t) => t.toLowerCase().includes(q));
+
+        // Filter chip
+        let matchesFilter = true;
+        if (filter === "Top Rated") {
+            matchesFilter = place.rating >= 4.5;
+        } else if (filter === "Trending") {
+            matchesFilter = place.rating >= 4.4;
+        } else if (filter === "Events") {
+            matchesFilter = place.category === "festival" || place.category === "event";
+        } else if (filter === "Near You") {
+            // Sort by distance when "Near You" — show all, sorted later
+            matchesFilter = true;
+        }
+
+        return matchesQuery && matchesFilter;
+    });
+}
+
+const INITIAL_LOAD = 6;
+const LOAD_DELAY = 150;
 
 function SearchResultSkeleton() {
     return (
@@ -83,17 +75,29 @@ export default function SearchPage() {
     const [activeFilter, setActiveFilter] = useState("All");
     const [searchQuery, setSearchQuery] = useState("");
     const [isLoading, setIsLoading] = useState(true);
-    const [displayedResults, setDisplayedResults] = useState(searchResults.slice(0, INITIAL_LOAD));
+    const [showCount, setShowCount] = useState(INITIAL_LOAD);
+
+    const filteredResults = useMemo(
+        () => filterPlaces(allPlaces, searchQuery, activeFilter),
+        [searchQuery, activeFilter]
+    );
+
+    const displayedResults = filteredResults.slice(0, showCount);
 
     // Simulate initial load for shimmer visibility
     useEffect(() => {
         setIsLoading(true);
+        setShowCount(INITIAL_LOAD);
         const timer = setTimeout(() => {
-            setDisplayedResults(searchResults.slice(0, INITIAL_LOAD));
             setIsLoading(false);
         }, LOAD_DELAY);
         return () => clearTimeout(timer);
     }, [activeFilter]);
+
+    // Reset show count when query changes (no skeleton needed for query)
+    useEffect(() => {
+        setShowCount(INITIAL_LOAD);
+    }, [searchQuery]);
 
     return (
         <div className="flex justify-center bg-background min-h-screen">
@@ -104,33 +108,56 @@ export default function SearchPage() {
                         <div className="flex items-center gap-3">
                             <Link
                                 href="/"
+                                aria-label="Go back"
                                 className="w-10 h-10 flex items-center justify-center press"
                             >
                                 <Icon name="arrow_back" />
                             </Link>
                             <div className="flex-1 relative">
+                                <label htmlFor="search-input" className="sr-only">
+                                    Search destinations
+                                </label>
                                 <input
-                                    type="text"
+                                    id="search-input"
+                                    type="search"
                                     placeholder="Search destinations, events..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     autoFocus
+                                    maxLength={100}
+                                    autoComplete="off"
+                                    spellCheck={false}
                                     className="w-full h-12 bg-card rounded-xl px-4 pr-10 text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                                 />
-                                <Icon
-                                    name="search"
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                                    size="md"
-                                />
+                                {searchQuery ? (
+                                    <button
+                                        onClick={() => setSearchQuery("")}
+                                        aria-label="Clear search"
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                                    >
+                                        <Icon name="close" size="md" />
+                                    </button>
+                                ) : (
+                                    <Icon
+                                        name="search"
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+                                        size="md"
+                                    />
+                                )}
                             </div>
                         </div>
 
                         {/* Filters */}
-                        <div className="flex gap-2 overflow-x-auto no-scrollbar mt-4 -mx-5 px-5">
+                        <div
+                            className="flex gap-2 overflow-x-auto no-scrollbar mt-4 -mx-5 px-5"
+                            role="group"
+                            aria-label="Filter results"
+                        >
                             {filters.map((filter) => (
                                 <button
                                     key={filter}
                                     onClick={() => setActiveFilter(filter)}
+                                    aria-pressed={activeFilter === filter}
                                     className={cn(
                                         "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all press",
                                         activeFilter === filter
@@ -146,6 +173,15 @@ export default function SearchPage() {
 
                     {/* Results Grid */}
                     <div className="px-5 pt-4">
+                        {/* Result count */}
+                        {!isLoading && (
+                            <p className="text-xs text-muted-foreground mb-3">
+                                {filteredResults.length === 0
+                                    ? "No results found"
+                                    : `${filteredResults.length} destination${filteredResults.length === 1 ? "" : "s"} found`}
+                            </p>
+                        )}
+
                         <div className="grid grid-cols-2 gap-4">
                             {isLoading ? (
                                 <>
@@ -154,6 +190,12 @@ export default function SearchPage() {
                                     <SearchResultSkeleton />
                                     <SearchResultSkeleton />
                                 </>
+                            ) : filteredResults.length === 0 ? (
+                                <div className="col-span-2 flex flex-col items-center justify-center py-16 text-muted-foreground">
+                                    <Icon name="search_off" size="xl" className="mb-3 opacity-40" />
+                                    <p className="font-semibold">No destinations found</p>
+                                    <p className="text-sm mt-1">Try a different search term or filter</p>
+                                </div>
                             ) : (
                                 displayedResults.map((result, index) => (
                                     <Link
@@ -163,7 +205,7 @@ export default function SearchPage() {
                                         style={{ animationDelay: `${index * 50}ms` }}
                                     >
                                         <ProgressiveImage
-                                            src={result.image}
+                                            src={result.images[0]}
                                             alt={result.title}
                                             fill
                                             sizes="(max-width: 420px) 50vw, 210px"
@@ -187,13 +229,13 @@ export default function SearchPage() {
                             )}
                         </div>
 
-                        {/* Load more for remaining results */}
-                        {!isLoading && displayedResults.length < searchResults.length && (
+                        {/* Load more */}
+                        {!isLoading && displayedResults.length < filteredResults.length && (
                             <button
-                                onClick={() => setDisplayedResults(searchResults)}
+                                onClick={() => setShowCount((c) => c + INITIAL_LOAD)}
                                 className="mt-4 w-full py-3 glass rounded-full text-center text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors press"
                             >
-                                Show all results ({searchResults.length - displayedResults.length} more)
+                                Show more ({filteredResults.length - displayedResults.length} remaining)
                             </button>
                         )}
                     </div>
