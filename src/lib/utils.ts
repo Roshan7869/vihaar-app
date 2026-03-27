@@ -33,3 +33,12 @@ export function truncateText(text: string, maxLength: number): string {
     if (text.length <= maxLength) return text;
     return text.slice(0, maxLength).trim() + "...";
 }
+
+/**
+ * Format a category string for display (replaces underscores with spaces, title-cases)
+ */
+export function formatCategory(category: string): string {
+    return category
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+}

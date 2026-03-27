@@ -1,99 +1,59 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { ProgressiveImage } from "@/components/ui/ProgressiveImage";
-import { Skeleton } from "@/components/ui/Skeleton";
 import { BottomNav } from "@/components/nav/BottomNav";
+import { bhilaiPlaces } from "@/lib/bhilai-places";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
-interface SearchResult {
-    id: string;
-    image: string;
-    category: string;
-    title: string;
-    location: string;
-}
+const FILTER_LABELS: Record<string, string> = {
+    all: "All",
+    temple: "Temple",
+    nature: "Nature",
+    historical: "Historical",
+    art_craft: "Shopping",
+    event: "Industrial",
+};
 
-const filters = ["All", "Trending", "Near You", "Top Rated", "Events"];
+const filters = Object.keys(FILTER_LABELS);
 
-const searchResults: SearchResult[] = [
-    {
-        id: "1",
-        image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=400",
-        category: "Nature",
-        title: "Chitrakote Falls",
-        location: "Bastar, CG",
-    },
-    {
-        id: "2",
-        image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400",
-        category: "Mountains",
-        title: "Valley of Flowers",
-        location: "Uttarakhand",
-    },
-    {
-        id: "3",
-        image: "https://images.unsplash.com/photo-1584559582128-b8be739912e4?w=400",
-        category: "Heritage",
-        title: "Bhoramdeo Temple",
-        location: "Kawardha, CG",
-    },
-    {
-        id: "4",
-        image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=400",
-        category: "Wildlife",
-        title: "Kanger Valley",
-        location: "Jagdalpur, CG",
-    },
-    {
-        id: "5",
-        image: "https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=400",
-        category: "Nature",
-        title: "Tirathgarh Falls",
-        location: "Bastar, CG",
-    },
-    {
-        id: "6",
-        image: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400",
-        category: "Adventure",
-        title: "Coorg Trails",
-        location: "Karnataka",
-    },
-];
-
-const INITIAL_LOAD = 4;
-const LOAD_DELAY = 200;
-
-function SearchResultSkeleton() {
-    return (
-        <div className="aspect-[3/4] rounded-2xl overflow-hidden relative bg-card">
-            <Skeleton className="absolute inset-0 rounded-none" />
-            <div className="absolute bottom-3 left-3 right-3 space-y-2">
-                <Skeleton className="w-12 h-4 rounded-full" />
-                <Skeleton className="w-3/4 h-5" variant="text" />
-                <Skeleton className="w-1/2 h-3" variant="text" />
-            </div>
-        </div>
-    );
+function sanitizeInput(value: string): string {
+    return value
+        .replace(/[<>&"'`]/g, "")
+        .slice(0, 100);
 }
 
 export default function SearchPage() {
-    const [activeFilter, setActiveFilter] = useState("All");
+    const [activeFilter, setActiveFilter] = useState("all");
     const [searchQuery, setSearchQuery] = useState("");
-    const [isLoading, setIsLoading] = useState(true);
-    const [displayedResults, setDisplayedResults] = useState(searchResults.slice(0, INITIAL_LOAD));
 
-    // Simulate initial load for shimmer visibility
-    useEffect(() => {
-        setIsLoading(true);
-        const timer = setTimeout(() => {
-            setDisplayedResults(searchResults.slice(0, INITIAL_LOAD));
-            setIsLoading(false);
-        }, LOAD_DELAY);
-        return () => clearTimeout(timer);
-    }, [activeFilter]);
+    const filteredResults = useMemo(() => {
+        const q = searchQuery.trim().toLowerCase();
+        return bhilaiPlaces.filter((place) => {
+            // Category filter
+            const categoryMatch =
+                activeFilter === "all" ||
+                place.category === activeFilter;
+
+            // Text search
+            const textMatch =
+                !q ||
+                place.title.toLowerCase().includes(q) ||
+                place.location.toLowerCase().includes(q) ||
+                place.category.toLowerCase().includes(q) ||
+                place.tags?.some((t) => t.toLowerCase().includes(q));
+
+            return categoryMatch && textMatch;
+        });
+    }, [activeFilter, searchQuery]);
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(sanitizeInput(e.target.value));
+    };
+
+    const handleClear = () => setSearchQuery("");
 
     return (
         <div className="flex justify-center bg-background min-h-screen">
@@ -104,24 +64,36 @@ export default function SearchPage() {
                         <div className="flex items-center gap-3">
                             <Link
                                 href="/"
+                                aria-label="Go back"
                                 className="w-10 h-10 flex items-center justify-center press"
                             >
                                 <Icon name="arrow_back" />
                             </Link>
                             <div className="flex-1 relative">
                                 <input
-                                    type="text"
-                                    placeholder="Search destinations, events..."
+                                    type="search"
+                                    placeholder="Search destinations, temples..."
                                     value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    onChange={handleSearchChange}
+                                    maxLength={100}
                                     autoFocus
                                     className="w-full h-12 bg-card rounded-xl px-4 pr-10 text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                                 />
-                                <Icon
-                                    name="search"
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                                    size="md"
-                                />
+                                {searchQuery ? (
+                                    <button
+                                        onClick={handleClear}
+                                        aria-label="Clear search"
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground press"
+                                    >
+                                        <Icon name="close" size="md" />
+                                    </button>
+                                ) : (
+                                    <Icon
+                                        name="search"
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                                        size="md"
+                                    />
+                                )}
                             </div>
                         </div>
 
@@ -138,24 +110,39 @@ export default function SearchPage() {
                                             : "bg-card text-muted-foreground"
                                     )}
                                 >
-                                    {filter}
+                                    {FILTER_LABELS[filter]}
                                 </button>
                             ))}
                         </div>
                     </div>
 
-                    {/* Results Grid */}
+                    {/* Results */}
                     <div className="px-5 pt-4">
+                        <p className="text-xs text-muted-foreground mb-3">
+                            {filteredResults.length === 0
+                                ? "No results found"
+                                : `${filteredResults.length} place${filteredResults.length !== 1 ? "s" : ""} found`}
+                        </p>
+
                         <div className="grid grid-cols-2 gap-4">
-                            {isLoading ? (
-                                <>
-                                    <SearchResultSkeleton />
-                                    <SearchResultSkeleton />
-                                    <SearchResultSkeleton />
-                                    <SearchResultSkeleton />
-                                </>
+                            {filteredResults.length === 0 ? (
+                                <div className="col-span-2 flex flex-col items-center justify-center py-16 text-muted-foreground">
+                                    <Icon name="search_off" size="xl" className="mb-3 opacity-40" />
+                                    <p className="font-semibold text-base">No places found</p>
+                                    <p className="text-sm mt-1 text-center">
+                                        Try a different search term or category
+                                    </p>
+                                    {searchQuery && (
+                                        <button
+                                            onClick={handleClear}
+                                            className="mt-4 px-5 py-2 bg-primary text-primary-foreground rounded-full text-sm font-semibold press"
+                                        >
+                                            Clear Search
+                                        </button>
+                                    )}
+                                </div>
                             ) : (
-                                displayedResults.map((result, index) => (
+                                filteredResults.map((result, index) => (
                                     <Link
                                         key={result.id}
                                         href={`/places/${result.id}`}
@@ -163,7 +150,7 @@ export default function SearchPage() {
                                         style={{ animationDelay: `${index * 50}ms` }}
                                     >
                                         <ProgressiveImage
-                                            src={result.image}
+                                            src={result.images[0]}
                                             alt={result.title}
                                             fill
                                             sizes="(max-width: 420px) 50vw, 210px"
@@ -186,16 +173,6 @@ export default function SearchPage() {
                                 ))
                             )}
                         </div>
-
-                        {/* Load more for remaining results */}
-                        {!isLoading && displayedResults.length < searchResults.length && (
-                            <button
-                                onClick={() => setDisplayedResults(searchResults)}
-                                className="mt-4 w-full py-3 glass rounded-full text-center text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors press"
-                            >
-                                Show all results ({searchResults.length - displayedResults.length} more)
-                            </button>
-                        )}
                     </div>
                 </div>
 

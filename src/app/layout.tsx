@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans, Dancing_Script, Inter } from "next/font/google";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { SavedProvider } from "@/context/SavedContext";
+import { FilterProvider } from "@/context/FilterContext";
 import "./globals.css";
 
 // Optimize font loading with display swap and preload
@@ -80,7 +82,11 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <ErrorBoundary>
-          {children}
+          <SavedProvider>
+            <FilterProvider>
+              {children}
+            </FilterProvider>
+          </SavedProvider>
         </ErrorBoundary>
       </body>
     </html>

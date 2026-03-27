@@ -2,92 +2,22 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Icon } from "@/components/ui/Icon";
-import { ProgressiveImage } from "@/components/ui/ProgressiveImage";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { DestinationCard } from "@/components/ui/DestinationCard";
-import { cn } from "@/lib/utils";
+import { getBhilaiPlacesByDistance } from "@/lib/bhilai-places";
+import { Place } from "@/types";
+import { cn, formatCategory } from "@/lib/utils";
 
-interface NearbyItem {
-    id: string;
-    image: string;
-    rating: number;
-    category: string;
-    title: string;
-    location: string;
-    distance: string;
-    description: string;
-}
-
-const allNearbyItems: NearbyItem[] = [
-    {
-        id: "1",
-        image: "https://images.unsplash.com/photo-1584559582128-b8be739912e4?w=800",
-        rating: 4.8,
-        category: "Temple",
-        title: "Danteshwari Temple",
-        location: "Dantewada, Chhattisgarh",
-        distance: "2.5 km",
-        description: "One of the 52 Shakti Peeths, dedicated to Goddess Danteshwari, the presiding deity of Bastar.",
-    },
-    {
-        id: "2",
-        image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800",
-        rating: 4.5,
-        category: "Nature",
-        title: "Kanger Valley National Park",
-        location: "Jagdalpur, Chhattisgarh",
-        distance: "12 km",
-        description: "Biosphere reserve with limestone caves, waterfalls, and diverse flora fauna including hill mynas.",
-    },
-    {
-        id: "3",
-        image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800",
-        rating: 4.2,
-        category: "Food",
-        title: "Tribal Kitchen",
-        location: "Jagdalpur Market, Chhattisgarh",
-        distance: "0.8 km",
-        description: "Authentic Bastar tribal cuisine featuring local delicacies like bamboo chicken and red ant chutney.",
-    },
-    {
-        id: "4",
-        image: "https://images.unsplash.com/photo-1566127444979-b3d2b654e3d7?w=800",
-        rating: 4.6,
-        category: "Museum",
-        title: "Anthropological Museum",
-        location: "Jagdalpur, Chhattisgarh",
-        distance: "3.2 km",
-        description: "Showcasing rich tribal heritage, artifacts, and cultural traditions of Bastar region.",
-    },
-    {
-        id: "5",
-        image: "https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=800",
-        rating: 4.9,
-        category: "Nature",
-        title: "Tirathgarh Falls",
-        location: "Jagdalpur, Chhattisgarh",
-        distance: "8 km",
-        description: "A 300ft cascading waterfall through lush green forests, perfect for nature photography.",
-    },
-    {
-        id: "6",
-        image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800",
-        rating: 4.4,
-        category: "Nature",
-        title: "Kutumsar Cave",
-        location: "Kanger Valley, Chhattisgarh",
-        distance: "15 km",
-        description: "One of the longest natural caves in India with stunning stalactite and stalagmite formations.",
-    },
-];
+const allNearbyItems: Place[] = getBhilaiPlacesByDistance();
 
 const categories = [
     { id: "all", label: "All", icon: "category" },
-    { id: "Temple", label: "Temple", icon: "temple_hindu" },
-    { id: "Nature", label: "Nature", icon: "forest" },
-    { id: "Food", label: "Food", icon: "restaurant" },
-    { id: "Museum", label: "Museum", icon: "museum" },
-    { id: "Heritage", label: "Heritage", icon: "account_balance" },
+    { id: "temple", label: "Temple", icon: "temple_hindu" },
+    { id: "nature", label: "Nature", icon: "forest" },
+    { id: "food", label: "Food", icon: "restaurant" },
+    { id: "historical", label: "Historical", icon: "museum" },
+    { id: "art_craft", label: "Shopping", icon: "account_balance" },
+    { id: "event", label: "Industrial", icon: "factory" },
 ];
 
 // Configuration for chunk loading
@@ -127,7 +57,7 @@ function NearbyItemSkeleton() {
 
 export const ChunkedNearbyFeed = ({ onItemClick, onViewAll, onLoadComplete }: ChunkedNearbyFeedProps) => {
     const [activeCategory, setActiveCategory] = useState("all");
-    const [displayedItems, setDisplayedItems] = useState<NearbyItem[]>([]);
+    const [displayedItems, setDisplayedItems] = useState<Place[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
 
@@ -255,11 +185,11 @@ export const ChunkedNearbyFeed = ({ onItemClick, onViewAll, onLoadComplete }: Ch
                             >
                                 <DestinationCard
                                     title={item.title}
-                                    imageUrl={item.image}
+                                    imageUrl={item.images[0]}
                                     rating={item.rating}
                                     location={item.location}
-                                    description={item.description}
-                                    badge={item.category}
+                                    description={item.short_description ?? item.description}
+                                    badge={formatCategory(item.category)}
                                     onClick={() => onItemClick?.(item.id)}
                                 />
                             </div>
@@ -282,7 +212,7 @@ export const ChunkedNearbyFeed = ({ onItemClick, onViewAll, onLoadComplete }: Ch
                         {/* End message */}
                         {!hasMore && displayedItems.length > 0 && (
                             <p className="text-center text-sm text-muted-foreground/50 py-2">
-                                You've seen all places
+                                You&apos;ve seen all places
                             </p>
                         )}
                     </>
