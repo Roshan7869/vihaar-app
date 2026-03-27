@@ -2,60 +2,8 @@
 
 import { useState, useRef } from "react";
 import { Icon } from "@/components/ui/Icon";
-import { ProgressiveImage } from "@/components/ui/ProgressiveImage";
 import { DestinationCard } from "@/components/ui/DestinationCard";
-
-interface FeaturedItem {
-    id: string;
-    image: string;
-    categories: string[];
-    title: string;
-    location: string;
-    description: string;
-}
-
-const featuredItems: FeaturedItem[] = [
-    {
-        id: "1",
-        image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=1200",
-        categories: ["Natural", "Waterfall"],
-        title: "Chitrakote Falls",
-        location: "Bastar, Chhattisgarh",
-        description: "Often called the Niagara of India, this horseshoe-shaped waterfall is the widest in India.",
-    },
-    {
-        id: "2",
-        image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200",
-        categories: ["Heritage", "Temple"],
-        title: "Bhoramdeo Temple",
-        location: "Kawardha, Chhattisgarh",
-        description: "Known as the Khajuraho of Chhattisgarh, famous for intricate carvings and ancient architecture.",
-    },
-    {
-        id: "3",
-        image: "https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=1200",
-        categories: ["Wildlife", "Sanctuary"],
-        title: "Kanger Valley",
-        location: "Jagdalpur, Chhattisgarh",
-        description: "Home to limestone caves, waterfalls, and rich biodiversity including the rare Bastar hill myna.",
-    },
-    {
-        id: "4",
-        image: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200",
-        categories: ["Adventure", "Trekking"],
-        title: "Mainpat Plateau",
-        location: "Surguja, Chhattisgarh",
-        description: "Mini Tibet of India with Tibetan settlements, monasteries, and breathtaking highland views.",
-    },
-    {
-        id: "5",
-        image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200",
-        categories: ["Historical", "Fort"],
-        title: "Rajim Temples",
-        location: "Gariaband, Chhattisgarh",
-        description: "Ancient temple complex at the confluence of three rivers, hosting the famous Rajim Kumbh Mela.",
-    },
-];
+import { featuredPlaces } from "@/lib/data";
 
 interface FeaturedCarouselProps {
     onExplore?: (id: string) => void;
@@ -89,7 +37,7 @@ export const FeaturedCarousel = ({ onExplore }: FeaturedCarouselProps) => {
         const diff = startX.current - currentX.current;
         const threshold = 50;
 
-        if (diff > threshold && currentIndex < featuredItems.length - 1) {
+        if (diff > threshold && currentIndex < featuredPlaces.length - 1) {
             setCurrentIndex(currentIndex + 1);
         } else if (diff < -threshold && currentIndex > 0) {
             setCurrentIndex(currentIndex - 1);
@@ -122,10 +70,11 @@ export const FeaturedCarousel = ({ onExplore }: FeaturedCarouselProps) => {
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-bold text-foreground">Featured of the Week</h2>
                 <div className="flex gap-1">
-                    {featuredItems.map((_, index) => (
+                    {featuredPlaces.map((_, index) => (
                         <button
                             key={index}
                             onClick={() => setCurrentIndex(index)}
+                            aria-label={`Go to slide ${index + 1}`}
                             className={`h-2 rounded-full transition-all duration-300 ${index === currentIndex
                                 ? "bg-primary w-6"
                                 : "bg-muted-foreground/40 w-2"
@@ -153,15 +102,16 @@ export const FeaturedCarousel = ({ onExplore }: FeaturedCarouselProps) => {
                         transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)'
                     }}
                 >
-                    {featuredItems.map((item, index) => (
+                    {featuredPlaces.map((item) => (
                         <div key={item.id} className="w-full flex-shrink-0 px-1">
                             <DestinationCard
                                 featured={true}
                                 title={item.title}
-                                imageUrl={item.image}
+                                imageUrl={item.images[0]}
                                 location={item.location}
-                                description={item.description}
-                                badge={item.categories[0]}
+                                description={item.subtitle ?? item.description}
+                                badge={item.tag ?? item.category}
+                                rating={item.rating}
                                 onClick={() => {
                                     if (!isDragging) onExplore?.(item.id);
                                 }}

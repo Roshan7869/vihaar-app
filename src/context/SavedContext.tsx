@@ -26,6 +26,7 @@ export function SavedProvider({ children }: { children: ReactNode }) {
         try {
             const stored = localStorage.getItem(STORAGE_KEY);
             if (stored) {
+                // localStorage hydration — setState in effect is the correct pattern here
                 // eslint-disable-next-line react-hooks/set-state-in-effect
                 setSavedPlaces(JSON.parse(stored) as Place[]);
             }

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { ProgressiveImage } from "@/components/ui/ProgressiveImage";
 
@@ -9,6 +8,7 @@ interface ExploreCardProps {
     category: string;
     title: string;
     description: string;
+    liked?: boolean;
     onNavigate?: () => void;
     onLike?: () => void;
     onShare?: () => void;
@@ -19,17 +19,11 @@ export const ExploreCard = ({
     category,
     title,
     description,
+    liked = false,
     onNavigate,
     onLike,
     onShare,
 }: ExploreCardProps) => {
-    const [liked, setLiked] = useState(false);
-
-    const handleLike = () => {
-        setLiked(!liked);
-        onLike?.();
-    };
-
     return (
         <div className="h-screen snap-start relative">
             <ProgressiveImage
@@ -45,7 +39,8 @@ export const ExploreCard = ({
             {/* Actions */}
             <div className="absolute right-5 bottom-36 flex flex-col gap-4">
                 <button
-                    onClick={handleLike}
+                    onClick={onLike}
+                    aria-label={liked ? "Remove from saved" : "Save this place"}
                     className="w-12 h-12 glass rounded-full flex items-center justify-center press"
                 >
                     <Icon
@@ -56,6 +51,7 @@ export const ExploreCard = ({
                 </button>
                 <button
                     onClick={onShare}
+                    aria-label="Share this place"
                     className="w-12 h-12 glass rounded-full flex items-center justify-center press"
                 >
                     <Icon name="share" />
@@ -78,9 +74,10 @@ export const ExploreCard = ({
             {/* Navigate CTA */}
             <button
                 onClick={onNavigate}
+                aria-label={`View details for ${title}`}
                 className="absolute bottom-28 right-5 bg-primary w-14 h-14 rounded-full flex items-center justify-center press shadow-glow"
             >
-                <Icon name="near_me" filled />
+                <Icon name="arrow_forward" filled />
             </button>
 
             {/* Swipe hint */}

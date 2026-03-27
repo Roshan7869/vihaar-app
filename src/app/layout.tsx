@@ -36,6 +36,7 @@ export const metadata: Metadata = {
   keywords: ["Chhattisgarh", "Tourism", "Travel", "Waterfalls", "Temples", "Tribal Art", "Bhilai"],
   authors: [{ name: "Vihaar Team" }],
   robots: "index, follow",
+  manifest: "/manifest.webmanifest",
   openGraph: {
     title: "Vihaar - Explore Chhattisgarh",
     description: "Discover the hidden gems of Chhattisgarh",

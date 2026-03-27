@@ -1,0 +1,43 @@
+{
+  "name": "Vihaar - Explore Chhattisgarh",
+  "short_name": "Vihaar",
+  "description": "Discover the hidden gems of Chhattisgarh - waterfalls, temples, tribal art, and local cuisine.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#201612",
+  "theme_color": "#201612",
+  "orientation": "portrait-primary",
+  "lang": "en-IN",
+  "categories": ["travel", "lifestyle"],
+  "icons": [
+    {
+      "src": "/next.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Explore",
+      "short_name": "Explore",
+      "description": "Browse top destinations in Chhattisgarh",
+      "url": "/explore",
+      "icons": [{ "src": "/globe.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Saved Places",
+      "short_name": "Saved",
+      "description": "View your saved wishlist",
+      "url": "/saved",
+      "icons": [{ "src": "/globe.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Search",
+      "short_name": "Search",
+      "description": "Search destinations",
+      "url": "/search",
+      "icons": [{ "src": "/globe.svg", "sizes": "any" }]
+    }
+  ]
+}
